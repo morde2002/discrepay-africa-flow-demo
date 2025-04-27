@@ -1,5 +1,6 @@
 
 import { useState } from "react";
+import { Link, useLocation } from "react-router-dom";
 import {
   Sidebar,
   SidebarContent,
@@ -10,7 +11,6 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
   SidebarHeader,
-  SidebarTrigger,
   SidebarFooter,
 } from "@/components/ui/sidebar";
 import { 
@@ -25,38 +25,39 @@ import {
 import { cn } from "@/lib/utils";
 
 const SidebarNav = () => {
-  const [activeItem, setActiveItem] = useState("dashboard");
+  const location = useLocation();
+  const pathname = location.pathname;
 
   const menuItems = [
     {
       id: "dashboard",
       title: "Dashboard",
       icon: ChartBar,
-      url: "#",
+      url: "/",
     },
     {
       id: "payments",
       title: "Payments",
       icon: CreditCard,
-      url: "#",
+      url: "/payouts",
     },
     {
       id: "settlements",
       title: "Settlements",
       icon: Wallet,
-      url: "#",
+      url: "/settlements",
     },
     {
       id: "compliance",
       title: "Compliance",
       icon: ShieldCheck,
-      url: "#",
+      url: "/compliance",
     },
     {
-      id: "reports",
-      title: "Reports",
+      id: "use-cases",
+      title: "Use Cases",
       icon: FileText,
-      url: "#",
+      url: "/use-cases",
     },
     {
       id: "integrations",
@@ -90,13 +91,15 @@ const SidebarNav = () => {
               {menuItems.map((item) => (
                 <SidebarMenuItem key={item.id}>
                   <SidebarMenuButton 
+                    asChild
                     className={cn(
-                      activeItem === item.id ? "bg-sidebar-accent text-white" : "text-sidebar-foreground/70"
+                      pathname === item.url ? "bg-sidebar-accent text-white" : "text-sidebar-foreground/70"
                     )}
-                    onClick={() => setActiveItem(item.id)}
                   >
-                    <item.icon className="w-5 h-5 mr-2" />
-                    <span>{item.title}</span>
+                    <Link to={item.url}>
+                      <item.icon className="w-5 h-5 mr-2" />
+                      <span>{item.title}</span>
+                    </Link>
                   </SidebarMenuButton>
                 </SidebarMenuItem>
               ))}
