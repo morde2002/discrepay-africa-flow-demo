@@ -1,4 +1,3 @@
-
 import React, { useState } from "react";
 import { 
   Dialog, 
@@ -11,7 +10,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
-import { Timeline } from "lucide-react";
+import { Clock } from "lucide-react";
 import { 
   Activity,
   User,
@@ -116,7 +115,7 @@ const RiskAlertDialog: React.FC<RiskAlertDialogProps> = ({ open, onClose, alert 
               Transactions
             </TabsTrigger>
             <TabsTrigger value="timeline">
-              <Timeline className="w-4 h-4 mr-2" />
+              <Clock className="w-4 h-4 mr-2" />
               Timeline
             </TabsTrigger>
             <TabsTrigger value="actions">
