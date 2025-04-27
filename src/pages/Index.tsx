@@ -6,12 +6,26 @@ import TransactionList from "@/components/dashboard/TransactionList";
 import ComplianceOverview from "@/components/dashboard/ComplianceOverview";
 import PaymentFlow from "@/components/dashboard/PaymentFlow";
 import { Button } from "@/components/ui/button";
-import { Bell, Search, Settings, LogIn } from "lucide-react";
+import { Bell, Search, Settings, User, LogOut } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import { useNavigate } from "react-router-dom";
+import { toast } from "sonner";
 
 const Index = () => {
   const navigate = useNavigate();
+
+  const handleLogout = () => {
+    localStorage.setItem('isAuthenticated', 'false');
+    toast.success("Logged out successfully");
+    navigate('/auth');
+  };
 
   return (
     <SidebarProvider>
@@ -31,20 +45,27 @@ const Index = () => {
                   placeholder="Search..."
                 />
               </div>
-              <Button 
-                variant="outline" 
-                className="gap-2"
-                onClick={() => navigate('/auth')}
-              >
-                <LogIn className="h-4 w-4" />
-                Sign In
-              </Button>
               <Button variant="outline" size="icon">
                 <Bell className="h-4 w-4" />
               </Button>
-              <Button variant="outline" size="icon">
-                <Settings className="h-4 w-4" />
-              </Button>
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="outline" size="icon">
+                    <Settings className="h-4 w-4" />
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end">
+                  <DropdownMenuItem>
+                    <User className="mr-2 h-4 w-4" />
+                    Profile
+                  </DropdownMenuItem>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem onClick={handleLogout}>
+                    <LogOut className="mr-2 h-4 w-4" />
+                    Log Out
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
               <Avatar>
                 <AvatarImage src="" />
                 <AvatarFallback className="bg-discrepay-600 text-white">JD</AvatarFallback>
@@ -73,3 +94,4 @@ const Index = () => {
 };
 
 export default Index;
+
