@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import ComplianceDashboard from "@/components/compliance/ComplianceDashboard";
 import RiskAlerts from "@/components/compliance/RiskAlerts";
+import RiskTrendHeatmap from "@/components/compliance/RiskTrendHeatmap";
 
 const Compliance = () => {
   return (
@@ -41,11 +42,12 @@ const Compliance = () => {
           
           <main className="px-4 sm:px-6 py-6 bg-gray-50">
             <div className="mb-6">
-              <h1 className="text-2xl font-bold">Compliance & Risk Monitoring</h1>
+              <h1 className="text-2xl font-bold mb-2">Compliance & Risk Monitoring</h1>
               <p className="text-muted-foreground">Monitor AML/KYC compliance, detect fraud patterns, and prepare regulatory reports.</p>
             </div>
             
             <ComplianceDashboard />
+            <RiskTrendHeatmap />
             <RiskAlerts />
           </main>
         </div>
