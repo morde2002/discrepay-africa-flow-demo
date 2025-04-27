@@ -61,7 +61,7 @@ const transactions = [
   {
     id: "TX936547",
     initiatedAmount: "₦187,250",
-    settledAmount: "₦182,678",
+    settledAmount: "₦182,569",
     status: "matched",
     processor: "Paystack",
     processorFee: "2.5%",
@@ -69,7 +69,7 @@ const transactions = [
     netAmount: "₦182,569",
     time: "2 days ago",
     date: "2024-04-25",
-  },
+  }
 ];
 
 const FundsFlowTracker = () => {

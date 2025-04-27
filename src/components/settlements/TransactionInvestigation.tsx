@@ -1,4 +1,3 @@
-
 import React, { useState } from "react";
 import {
   Drawer,
@@ -50,7 +49,6 @@ type TransactionData = {
   retryAttempts?: number;
 };
 
-// More comprehensive transaction data for multiple transactions
 const mockTransactionData: Record<string, TransactionData> = {
   "TX938485": {
     id: "TX938485",
@@ -262,6 +260,60 @@ const mockTransactionData: Record<string, TransactionData> = {
       { label: "Variance", value: "₦522,448 (Missing)", highlight: true },
     ],
   },
+  "TX936547": {
+    id: "TX936547",
+    status: "matched",
+    processor: "Paystack",
+    processorFee: "2.5%",
+    processorFeeAmount: "₦4,681",
+    netAmount: "₦182,569",
+    amount: "₦187,250",
+    expectedTime: "09:00 AM",
+    actualTime: "09:02 AM",
+    events: [
+      {
+        timestamp: "2024-04-25 09:00:00",
+        status: "completed",
+        description: "Payment Initiated",
+        details: "Amount: ₦187,250",
+      },
+      {
+        timestamp: "2024-04-25 09:00:05",
+        status: "completed",
+        description: "Payment Authorized",
+        details: "Processor: Paystack",
+      },
+      {
+        timestamp: "2024-04-25 09:01:30",
+        status: "completed",
+        description: "Settlement Processing",
+        details: "Expected completion: 09:00 AM",
+      },
+      {
+        timestamp: "2024-04-25 09:02:00",
+        status: "completed",
+        description: "Settlement Completed",
+        details: "Amount received: ₦182,569",
+      },
+      {
+        timestamp: "2024-04-25 09:02:01",
+        status: "completed",
+        description: "Settlement Verified",
+        details: "All amounts matched successfully",
+      },
+    ],
+    financialDetails: [
+      { label: "Initiated Amount", value: "₦187,250" },
+      { label: "Processor", value: "Paystack" },
+      { label: "Processor Fee %", value: "2.5%" },
+      { label: "Processor Fee Amount", value: "₦4,681" },
+      { label: "Net Settlement Amount", value: "₦182,569" },
+      { label: "Bank Fees", value: "₦0" },
+      { label: "Final Amount Received", value: "₦182,569", highlight: true },
+      { label: "Expected Amount", value: "₦182,569", highlight: true },
+      { label: "Variance", value: "₦0 (Matched)", highlight: true },
+    ],
+  },
 };
 
 const getStatusIcon = (status: TransactionEvent["status"]) => {
@@ -279,9 +331,8 @@ export const TransactionInvestigation = ({ transactionId }: { transactionId: str
   const [isOpen, setIsOpen] = useState(false);
   const [activeTab, setActiveTab] = useState("timeline");
   
-  // Get the correct transaction based on its reference
   const transaction = mockTransactionData[transactionId] || 
-    mockTransactionData[transactionId.split(" ")[0]]; // Handle "Multi (5)" case
+    mockTransactionData[transactionId.split(" ")[0]];
 
   const handleAction = (action: string) => {
     switch (action) {
