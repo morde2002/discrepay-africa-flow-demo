@@ -1,13 +1,63 @@
-// Update this page (the content is just a fallback if you fail to update the page)
+
+import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
+import SidebarNav from "@/components/layout/Sidebar";
+import FinancialSummary from "@/components/dashboard/FinancialSummary";
+import TransactionList from "@/components/dashboard/TransactionList";
+import ComplianceOverview from "@/components/dashboard/ComplianceOverview";
+import PaymentFlow from "@/components/dashboard/PaymentFlow";
+import { Button } from "@/components/ui/button";
+import { Bell, Search, Settings } from "lucide-react";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
 const Index = () => {
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-100">
-      <div className="text-center">
-        <h1 className="text-4xl font-bold mb-4">Welcome to Your Blank App</h1>
-        <p className="text-xl text-gray-600">Start building your amazing project here!</p>
+    <SidebarProvider>
+      <div className="min-h-screen flex w-full">
+        <SidebarNav />
+        <div className="flex-1 overflow-auto">
+          <header className="sticky top-0 z-30 bg-white border-b px-4 sm:px-6 py-3 flex items-center justify-between">
+            <div className="flex items-center">
+              <SidebarTrigger />
+              <div className="ml-4 text-lg font-medium">Dashboard</div>
+            </div>
+            <div className="flex items-center space-x-4">
+              <div className="relative hidden md:block">
+                <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
+                <input
+                  className="pl-8 pr-4 py-2 text-sm border rounded-md w-64 focus:outline-none focus:ring-2 focus:ring-discrepay-300 focus:border-transparent"
+                  placeholder="Search..."
+                />
+              </div>
+              <Button variant="outline" size="icon">
+                <Bell className="h-4 w-4" />
+              </Button>
+              <Button variant="outline" size="icon">
+                <Settings className="h-4 w-4" />
+              </Button>
+              <Avatar>
+                <AvatarImage src="" />
+                <AvatarFallback className="bg-discrepay-600 text-white">JD</AvatarFallback>
+              </Avatar>
+            </div>
+          </header>
+          
+          <main className="px-4 sm:px-6 py-6 bg-gray-50">
+            <div className="mb-6">
+              <h1 className="text-2xl font-bold">Financial Control Dashboard</h1>
+              <p className="text-muted-foreground">Welcome back! Here's the latest overview of your financial operations.</p>
+            </div>
+            
+            <FinancialSummary />
+            <TransactionList />
+            
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              <ComplianceOverview />
+              <PaymentFlow />
+            </div>
+          </main>
+        </div>
       </div>
-    </div>
+    </SidebarProvider>
   );
 };
 
