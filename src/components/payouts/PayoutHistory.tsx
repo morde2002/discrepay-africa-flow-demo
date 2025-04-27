@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import DashboardCard from "@/components/ui/DashboardCard";
 import { Input } from "@/components/ui/input";
@@ -6,6 +5,8 @@ import { Button } from "@/components/ui/button";
 import { Search, Download, FileText } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import PayoutDetailsDialog from "./PayoutDetailsDialog";
+import PayoutReportDialog from "./PayoutReportDialog";
 import {
   Table,
   TableBody,
@@ -15,7 +16,6 @@ import {
   TableRow,
 } from "@/components/ui/table";
 
-// Sample payout data
 const payouts = [
   {
     id: "PO-2025042701",
@@ -77,6 +77,9 @@ const payouts = [
 const PayoutHistory = () => {
   const [filter, setFilter] = useState("all");
   const [searchTerm, setSearchTerm] = useState("");
+  const [selectedPayout, setSelectedPayout] = useState<any>(null);
+  const [detailsOpen, setDetailsOpen] = useState(false);
+  const [reportOpen, setReportOpen] = useState(false);
 
   const filteredPayouts = payouts.filter(payout => {
     if (filter !== "all" && payout.status !== filter) return false;
@@ -125,6 +128,16 @@ const PayoutHistory = () => {
       minimumFractionDigits: 0,
       maximumFractionDigits: 0 
     }).format(amount);
+  };
+
+  const handleViewClick = (payout: any) => {
+    setSelectedPayout(payout);
+    setDetailsOpen(true);
+  };
+
+  const handleReportClick = (payout: any) => {
+    setSelectedPayout(payout);
+    setReportOpen(true);
   };
 
   return (
@@ -197,10 +210,20 @@ const PayoutHistory = () => {
                   </TableCell>
                   <TableCell>
                     <div className="flex space-x-2">
-                      <Button variant="ghost" size="sm" className="h-8 px-2 text-xs">
+                      <Button 
+                        variant="ghost" 
+                        size="sm" 
+                        className="h-8 px-2 text-xs"
+                        onClick={() => handleViewClick(payout)}
+                      >
                         View
                       </Button>
-                      <Button variant="ghost" size="sm" className="h-8 px-2 text-xs">
+                      <Button 
+                        variant="ghost" 
+                        size="sm" 
+                        className="h-8 px-2 text-xs"
+                        onClick={() => handleReportClick(payout)}
+                      >
                         <FileText className="h-3 w-3 mr-1" />
                         Report
                       </Button>
@@ -224,6 +247,21 @@ const PayoutHistory = () => {
           </Table>
         </div>
       </div>
+
+      {selectedPayout && (
+        <>
+          <PayoutDetailsDialog
+            payout={selectedPayout}
+            open={detailsOpen}
+            onOpenChange={setDetailsOpen}
+          />
+          <PayoutReportDialog
+            payout={selectedPayout}
+            open={reportOpen}
+            onOpenChange={setReportOpen}
+          />
+        </>
+      )}
     </DashboardCard>
   );
 };
