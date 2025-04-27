@@ -5,6 +5,8 @@ import { Bell, Search, Settings } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import BuyPowerCase from "@/components/usecases/BuyPowerCase";
+import KCBBankCase from "@/components/usecases/KCBBankCase";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 const UseCases = () => {
   return (
@@ -44,7 +46,18 @@ const UseCases = () => {
               <p className="text-muted-foreground">Explore how Discrepay empowers different financial institutions across Africa.</p>
             </div>
             
-            <BuyPowerCase />
+            <Tabs defaultValue="buypower" className="mb-6">
+              <TabsList>
+                <TabsTrigger value="buypower">BuyPower (Utility Payments)</TabsTrigger>
+                <TabsTrigger value="kcb">KCB Bank Kenya (Banking)</TabsTrigger>
+              </TabsList>
+              <TabsContent value="buypower">
+                <BuyPowerCase />
+              </TabsContent>
+              <TabsContent value="kcb">
+                <KCBBankCase />
+              </TabsContent>
+            </Tabs>
           </main>
         </div>
       </div>
