@@ -4,6 +4,7 @@ import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Checkbox } from "@/components/ui/checkbox";
 import {
   Card,
   CardContent,
@@ -22,18 +23,21 @@ const Auth = () => {
   // Login form state
   const [loginEmail, setLoginEmail] = useState("");
   const [loginPassword, setLoginPassword] = useState("");
+  const [rememberMe, setRememberMe] = useState(false);
   
   // Signup form state
+  const [fullName, setFullName] = useState("");
   const [companyName, setCompanyName] = useState("");
   const [signupEmail, setSignupEmail] = useState("");
+  const [phone, setPhone] = useState("");
   const [signupPassword, setSignupPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
+  const [acceptTerms, setAcceptTerms] = useState(false);
 
   const handleLogin = (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
     
-    // Mock authentication logic
     setTimeout(() => {
       setIsLoading(false);
       toast.success("Login successful");
@@ -44,7 +48,11 @@ const Auth = () => {
   const handleSignup = (e: React.FormEvent) => {
     e.preventDefault();
     
-    // Basic validation
+    if (!acceptTerms) {
+      toast.error("Please accept the Terms of Service");
+      return;
+    }
+    
     if (signupPassword !== confirmPassword) {
       toast.error("Passwords do not match");
       return;
@@ -52,12 +60,20 @@ const Auth = () => {
     
     setIsLoading(true);
     
-    // Mock signup logic
     setTimeout(() => {
       setIsLoading(false);
-      toast.success("Account created successfully");
+      toast.success("Account created successfully! Please check your email to verify your account.");
       navigate("/");
     }, 1000);
+  };
+
+  const handleForgotPassword = () => {
+    const email = loginEmail;
+    if (!email) {
+      toast.error("Please enter your email address");
+      return;
+    }
+    toast.success("Password reset instructions sent to your email");
   };
 
   return (
@@ -68,7 +84,7 @@ const Auth = () => {
             <div className="text-2xl font-bold text-white">D</div>
           </div>
           <h1 className="text-3xl font-bold">Discrepay</h1>
-          <p className="text-gray-500">Settlement monitoring and reconciliation</p>
+          <p className="text-gray-500">Monitor, Control, and Reconcile Your Financial Operations in Real Time</p>
         </div>
 
         <Tabs defaultValue="login">
@@ -80,15 +96,15 @@ const Auth = () => {
           <TabsContent value="login">
             <Card>
               <CardHeader>
-                <CardTitle>Company Login</CardTitle>
+                <CardTitle>Welcome Back</CardTitle>
                 <CardDescription>
-                  Enter your credentials to access your dashboard
+                  Login to access your dashboard
                 </CardDescription>
               </CardHeader>
               <form onSubmit={handleLogin}>
                 <CardContent className="space-y-4">
                   <div className="space-y-2">
-                    <Label htmlFor="login-email">Email</Label>
+                    <Label htmlFor="login-email">Business Email</Label>
                     <Input 
                       id="login-email" 
                       type="email" 
@@ -101,23 +117,39 @@ const Auth = () => {
                   <div className="space-y-2">
                     <div className="flex items-center justify-between">
                       <Label htmlFor="login-password">Password</Label>
-                      <a href="#" className="text-xs text-discrepay-600 hover:underline">
+                      <button 
+                        type="button"
+                        onClick={handleForgotPassword}
+                        className="text-xs text-discrepay-600 hover:underline"
+                      >
                         Forgot password?
-                      </a>
+                      </button>
                     </div>
                     <Input 
                       id="login-password" 
                       type="password" 
-                      placeholder="••••••••" 
                       value={loginPassword}
                       onChange={(e) => setLoginPassword(e.target.value)}
                       required
                     />
                   </div>
+                  <div className="flex items-center space-x-2">
+                    <Checkbox 
+                      id="remember" 
+                      checked={rememberMe}
+                      onCheckedChange={(checked) => setRememberMe(checked as boolean)}
+                    />
+                    <label
+                      htmlFor="remember"
+                      className="text-sm text-gray-500 leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                    >
+                      Remember me
+                    </label>
+                  </div>
                 </CardContent>
                 <CardFooter>
                   <Button type="submit" className="w-full" disabled={isLoading}>
-                    {isLoading ? "Logging in..." : "Login"}
+                    {isLoading ? "Logging in..." : "Log In"}
                   </Button>
                 </CardFooter>
               </form>
@@ -127,25 +159,33 @@ const Auth = () => {
           <TabsContent value="signup">
             <Card>
               <CardHeader>
-                <CardTitle>Create Company Account</CardTitle>
+                <CardTitle>Create Account</CardTitle>
                 <CardDescription>
-                  Register your company to start monitoring settlements
+                  Get started with Discrepay
                 </CardDescription>
               </CardHeader>
               <form onSubmit={handleSignup}>
                 <CardContent className="space-y-4">
                   <div className="space-y-2">
+                    <Label htmlFor="full-name">Full Name</Label>
+                    <Input 
+                      id="full-name"
+                      value={fullName}
+                      onChange={(e) => setFullName(e.target.value)}
+                      required
+                    />
+                  </div>
+                  <div className="space-y-2">
                     <Label htmlFor="company-name">Company Name</Label>
                     <Input 
                       id="company-name" 
-                      placeholder="Your Company Ltd" 
                       value={companyName}
                       onChange={(e) => setCompanyName(e.target.value)}
                       required
                     />
                   </div>
                   <div className="space-y-2">
-                    <Label htmlFor="signup-email">Email</Label>
+                    <Label htmlFor="signup-email">Business Email</Label>
                     <Input 
                       id="signup-email" 
                       type="email" 
@@ -156,11 +196,19 @@ const Auth = () => {
                     />
                   </div>
                   <div className="space-y-2">
+                    <Label htmlFor="phone">Phone Number (Optional)</Label>
+                    <Input 
+                      id="phone" 
+                      type="tel" 
+                      value={phone}
+                      onChange={(e) => setPhone(e.target.value)}
+                    />
+                  </div>
+                  <div className="space-y-2">
                     <Label htmlFor="signup-password">Password</Label>
                     <Input 
                       id="signup-password" 
                       type="password" 
-                      placeholder="••••••••" 
                       value={signupPassword}
                       onChange={(e) => setSignupPassword(e.target.value)}
                       required
@@ -171,11 +219,31 @@ const Auth = () => {
                     <Input 
                       id="confirm-password" 
                       type="password" 
-                      placeholder="••••••••" 
                       value={confirmPassword}
                       onChange={(e) => setConfirmPassword(e.target.value)}
                       required
                     />
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <Checkbox 
+                      id="terms" 
+                      checked={acceptTerms}
+                      onCheckedChange={(checked) => setAcceptTerms(checked as boolean)}
+                      required
+                    />
+                    <label
+                      htmlFor="terms"
+                      className="text-sm text-gray-500 leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                    >
+                      I agree to Discrepay's{" "}
+                      <a href="#" className="text-discrepay-600 hover:underline">
+                        Terms of Service
+                      </a>{" "}
+                      and{" "}
+                      <a href="#" className="text-discrepay-600 hover:underline">
+                        Privacy Policy
+                      </a>
+                    </label>
                   </div>
                 </CardContent>
                 <CardFooter>
@@ -193,3 +261,4 @@ const Auth = () => {
 };
 
 export default Auth;
+
