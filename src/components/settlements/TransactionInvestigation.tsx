@@ -15,6 +15,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Clock, Info, AlertTriangle } from "lucide-react";
+import { useState } from "react";
 
 type TransactionEvent = {
   timestamp: string;
@@ -28,6 +29,7 @@ type TransactionData = {
   events: TransactionEvent[];
 };
 
+// More comprehensive transaction data for multiple transactions
 const mockTransactionData: Record<string, TransactionData> = {
   "TX938485": {
     id: "TX938485",
@@ -58,7 +60,105 @@ const mockTransactionData: Record<string, TransactionData> = {
       },
     ],
   },
-  // Add more transaction data as needed
+  "TX938421": {
+    id: "TX938421",
+    events: [
+      {
+        timestamp: "2024-04-27 08:15:00",
+        status: "completed",
+        description: "Payment Initiated",
+        details: "Amount: ₦128,500",
+      },
+      {
+        timestamp: "2024-04-27 08:15:10",
+        status: "completed",
+        description: "Payment Authorized",
+        details: "Processor: Flutterwave",
+      },
+      {
+        timestamp: "2024-04-27 08:15:45",
+        status: "completed",
+        description: "Settlement Processing",
+        details: "Expected completion: 09:00 AM",
+      },
+      {
+        timestamp: "2024-04-27 12:30:00",
+        status: "pending",
+        description: "Settlement Delayed",
+        details: "Reason: Processor backlog",
+      },
+    ],
+  },
+  "TX937712": {
+    id: "TX937712",
+    events: [
+      {
+        timestamp: "2024-04-26 14:30:00",
+        status: "completed",
+        description: "Payment Initiated",
+        details: "Amount: ₦75,250",
+      },
+      {
+        timestamp: "2024-04-26 14:30:12",
+        status: "completed",
+        description: "Payment Authorized",
+        details: "Processor: Direct Bank",
+      },
+      {
+        timestamp: "2024-04-26 14:35:00",
+        status: "completed",
+        description: "Settlement Processing",
+        details: "Expected completion: 15:00 PM",
+      },
+      {
+        timestamp: "2024-04-26 15:15:00",
+        status: "completed",
+        description: "Settlement Completed",
+        details: "Amount received: ₦72,950",
+      },
+      {
+        timestamp: "2024-04-26 15:16:00",
+        status: "failed",
+        description: "Variance Detected",
+        details: "Expected: ₦75,250, Received: ₦72,950",
+      },
+    ],
+  },
+  "Multi": {
+    id: "Multi (5)",
+    events: [
+      {
+        timestamp: "2024-04-26 09:00:00",
+        status: "completed",
+        description: "Batch Payments Initiated",
+        details: "5 payments, Total: ₦534,200",
+      },
+      {
+        timestamp: "2024-04-26 09:01:30",
+        status: "completed",
+        description: "Payments Authorized",
+        details: "Processor: Interswitch",
+      },
+      {
+        timestamp: "2024-04-26 09:15:00",
+        status: "failed", 
+        description: "Settlement Failed",
+        details: "Reason: API Error",
+      },
+      {
+        timestamp: "2024-04-26 10:00:00",
+        status: "completed",
+        description: "Settlement Retry Initiated",
+        details: "Manual retry by admin",
+      },
+      {
+        timestamp: "2024-04-26 10:30:00",
+        status: "failed",
+        description: "Settlement Retry Failed",
+        details: "Reason: Insufficient funds in processor account",
+      },
+    ],
+  },
 };
 
 const getStatusIcon = (status: TransactionEvent["status"]) => {
@@ -73,22 +173,26 @@ const getStatusIcon = (status: TransactionEvent["status"]) => {
 };
 
 export const TransactionInvestigation = ({ transactionId }: { transactionId: string }) => {
-  const transaction = mockTransactionData[transactionId];
+  const [isOpen, setIsOpen] = useState(false);
+  
+  // Get the correct transaction based on its reference
+  const transaction = mockTransactionData[transactionId] || 
+    mockTransactionData[transactionId.split(" ")[0]]; // Handle "Multi (5)" case
 
   if (!transaction) {
     return null;
   }
 
   return (
-    <Drawer>
+    <Drawer open={isOpen} onOpenChange={setIsOpen}>
       <DrawerTrigger className="text-discrepay-600 hover:text-discrepay-800 underline text-xs">
         Investigate
       </DrawerTrigger>
-      <DrawerContent>
+      <DrawerContent className="max-h-[90vh]">
         <DrawerHeader>
           <DrawerTitle>Transaction Investigation - {transaction.id}</DrawerTitle>
         </DrawerHeader>
-        <div className="p-4">
+        <div className="p-4 overflow-auto">
           <Table>
             <TableHeader>
               <TableRow>

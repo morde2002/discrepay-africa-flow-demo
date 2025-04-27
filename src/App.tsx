@@ -10,6 +10,7 @@ import Payouts from "./pages/Payouts";
 import Compliance from "./pages/Compliance";
 import UserFlows from "./pages/UserFlows";
 import NotFound from "./pages/NotFound";
+import Auth from "./pages/Auth";
 
 const queryClient = new QueryClient();
 
@@ -20,6 +21,7 @@ const App = () => (
       <Sonner />
       <BrowserRouter>
         <Routes>
+          <Route path="/auth" element={<Auth />} />
           <Route path="/" element={<Index />} />
           <Route path="/settlements" element={<Settlements />} />
           <Route path="/payouts" element={<Payouts />} />

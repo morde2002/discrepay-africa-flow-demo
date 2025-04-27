@@ -1,6 +1,6 @@
 
 import { useState } from "react";
-import { Link, useLocation } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import {
   Sidebar,
   SidebarContent,
@@ -17,16 +17,26 @@ import {
   CreditCard, 
   Wallet, 
   ChartBar, 
-  Database, 
+  Database,
   Settings, 
-  ShieldCheck, 
-  FileText 
+  ShieldCheck,
+  FileText,
+  LogOut,
+  User
 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { Button } from "@/components/ui/button";
+import { toast } from "sonner";
 
 const SidebarNav = () => {
   const location = useLocation();
+  const navigate = useNavigate();
   const pathname = location.pathname;
+  
+  const handleLogout = () => {
+    toast.success("Logged out successfully");
+    navigate("/auth");
+  };
 
   const menuItems = [
     {
@@ -54,22 +64,10 @@ const SidebarNav = () => {
       url: "/compliance",
     },
     {
-      id: "use-cases",
-      title: "Use Cases",
+      id: "user-flows",
+      title: "User Flows",
       icon: FileText,
-      url: "/use-cases",
-    },
-    {
-      id: "integrations",
-      title: "Integrations",
-      icon: Database,
-      url: "#",
-    },
-    {
-      id: "settings",
-      title: "Settings",
-      icon: Settings,
-      url: "#",
+      url: "/user-flows",
     },
   ];
 
@@ -103,14 +101,48 @@ const SidebarNav = () => {
                   </SidebarMenuButton>
                 </SidebarMenuItem>
               ))}
+              
+              {/* Add settings and integrations as disabled items */}
+              <SidebarMenuItem>
+                <SidebarMenuButton 
+                  className="text-sidebar-foreground/50 cursor-not-allowed"
+                  disabled
+                >
+                  <Database className="w-5 h-5 mr-2" />
+                  <span>Integrations</span>
+                  <span className="ml-2 text-xs bg-gray-700 px-1.5 py-0.5 rounded">Coming Soon</span>
+                </SidebarMenuButton>
+              </SidebarMenuItem>
+              
+              <SidebarMenuItem>
+                <SidebarMenuButton 
+                  className="text-sidebar-foreground/50 cursor-not-allowed"
+                  disabled
+                >
+                  <Settings className="w-5 h-5 mr-2" />
+                  <span>Settings</span>
+                  <span className="ml-2 text-xs bg-gray-700 px-1.5 py-0.5 rounded">Coming Soon</span>
+                </SidebarMenuButton>
+              </SidebarMenuItem>
             </SidebarMenu>
           </SidebarGroupContent>
         </SidebarGroup>
       </SidebarContent>
       <SidebarFooter className="p-4">
-        <div className="flex items-center text-xs text-sidebar-foreground/60">
-          <div className="w-2 h-2 bg-green-500 rounded-full mr-2"></div>
-          All systems operational
+        <div className="flex flex-col gap-2">
+          <div className="flex items-center text-xs text-sidebar-foreground/60 mb-2">
+            <div className="w-2 h-2 bg-green-500 rounded-full mr-2"></div>
+            All systems operational
+          </div>
+          <Button 
+            variant="outline" 
+            size="sm" 
+            className="w-full justify-start text-sidebar-foreground/70"
+            onClick={handleLogout}
+          >
+            <LogOut className="w-4 h-4 mr-2" />
+            Sign Out
+          </Button>
         </div>
       </SidebarFooter>
     </Sidebar>
