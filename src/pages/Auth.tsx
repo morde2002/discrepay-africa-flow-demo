@@ -90,7 +90,7 @@ const Auth = () => {
             className="mx-auto h-12 w-auto"
           />
           <h1 className="text-3xl font-bold">Discrepay</h1>
-          <p className="text-gray-500">Monitor, Control, and Reconcile Your Financial Operations in Real Time</p>
+          <p className="text-gray-500">Monitor, Control and Settle Your Financial Operations in Real Time</p>
         </div>
 
         <Tabs defaultValue="login">
