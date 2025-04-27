@@ -84,9 +84,11 @@ const Auth = () => {
     <div className="flex min-h-screen items-center justify-center bg-gray-50 p-4">
       <div className="w-full max-w-md space-y-4">
         <div className="text-center">
-          <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-discrepay-500">
-            <div className="text-2xl font-bold text-white">D</div>
-          </div>
+          <img
+            src="/lovable-uploads/c6b58a34-ac83-45c0-8be4-4c26b436414d.png"
+            alt="Discrepay Logo"
+            className="mx-auto h-12 w-auto"
+          />
           <h1 className="text-3xl font-bold">Discrepay</h1>
           <p className="text-gray-500">Monitor, Control, and Reconcile Your Financial Operations in Real Time</p>
         </div>
@@ -265,4 +267,3 @@ const Auth = () => {
 };
 
 export default Auth;
-
