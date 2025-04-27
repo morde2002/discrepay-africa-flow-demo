@@ -26,6 +26,13 @@ const Index = () => {
     toast.success("Logged out successfully");
     navigate('/auth');
   };
+  
+  const handleProfileClick = () => {
+    // For now we'll just show a toast that this feature is coming soon
+    toast.info("Profile management coming soon!");
+    // You could navigate to a profile page once it's built
+    // navigate('/profile');
+  };
 
   return (
     <SidebarProvider>
@@ -55,7 +62,7 @@ const Index = () => {
                   </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end">
-                  <DropdownMenuItem>
+                  <DropdownMenuItem onClick={handleProfileClick}>
                     <User className="mr-2 h-4 w-4" />
                     Profile
                   </DropdownMenuItem>
@@ -94,4 +101,3 @@ const Index = () => {
 };
 
 export default Index;
-
