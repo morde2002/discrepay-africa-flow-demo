@@ -6,10 +6,13 @@ import TransactionList from "@/components/dashboard/TransactionList";
 import ComplianceOverview from "@/components/dashboard/ComplianceOverview";
 import PaymentFlow from "@/components/dashboard/PaymentFlow";
 import { Button } from "@/components/ui/button";
-import { Bell, Search, Settings } from "lucide-react";
+import { Bell, Search, Settings, LogIn } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { useNavigate } from "react-router-dom";
 
 const Index = () => {
+  const navigate = useNavigate();
+
   return (
     <SidebarProvider>
       <div className="min-h-screen flex w-full">
@@ -28,6 +31,14 @@ const Index = () => {
                   placeholder="Search..."
                 />
               </div>
+              <Button 
+                variant="outline" 
+                className="gap-2"
+                onClick={() => navigate('/auth')}
+              >
+                <LogIn className="h-4 w-4" />
+                Sign In
+              </Button>
               <Button variant="outline" size="icon">
                 <Bell className="h-4 w-4" />
               </Button>
