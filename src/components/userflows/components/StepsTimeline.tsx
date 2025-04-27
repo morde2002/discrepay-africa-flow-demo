@@ -5,7 +5,7 @@ import StepCard from "./StepCard";
 const StepsTimeline = () => {
   const steps = [
     {
-      number: 1,
+      stepNumber: 1,
       title: "Access Discrepay Dashboard",
       items: [
         "Secure login to view operational metrics",
@@ -13,7 +13,7 @@ const StepsTimeline = () => {
       ]
     },
     {
-      number: 2,
+      stepNumber: 2,
       title: "Live Funds Monitoring",
       items: [
         "Real-time transaction tracking with detailed status",
@@ -21,7 +21,7 @@ const StepsTimeline = () => {
       ]
     },
     {
-      number: 3,
+      stepNumber: 3,
       title: "Variance Detection Alerts",
       items: [
         "Real-time alerts for missing or delayed settlements",
@@ -39,7 +39,7 @@ const StepsTimeline = () => {
       <div className="relative z-10 flex flex-col items-center w-full">
         {steps.map((step, index) => (
           <>
-            <StepCard key={step.number} {...step} />
+            <StepCard key={step.stepNumber} {...step} />
             {index < steps.length - 1 && (
               <div className="flex justify-center mb-8">
                 <ArrowRight className="h-6 w-6 text-green-500" />
