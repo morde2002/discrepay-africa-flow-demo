@@ -38,8 +38,10 @@ const Auth = () => {
     e.preventDefault();
     setIsLoading(true);
     
+    // Mock login - replace with actual authentication
     setTimeout(() => {
       setIsLoading(false);
+      localStorage.setItem('isAuthenticated', 'true');
       toast.success("Login successful");
       navigate("/");
     }, 1000);
@@ -60,8 +62,10 @@ const Auth = () => {
     
     setIsLoading(true);
     
+    // Mock signup - replace with actual registration
     setTimeout(() => {
       setIsLoading(false);
+      localStorage.setItem('isAuthenticated', 'true');
       toast.success("Account created successfully! Please check your email to verify your account.");
       navigate("/");
     }, 1000);
