@@ -9,6 +9,7 @@ import Settlements from "./pages/Settlements";
 import Payouts from "./pages/Payouts";
 import Compliance from "./pages/Compliance";
 import UseCases from "./pages/UseCases";
+import UserFlows from "./pages/UserFlows";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -25,6 +26,7 @@ const App = () => (
           <Route path="/payouts" element={<Payouts />} />
           <Route path="/compliance" element={<Compliance />} />
           <Route path="/use-cases" element={<UseCases />} />
+          <Route path="/user-flows" element={<UserFlows />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>

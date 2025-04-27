@@ -1,249 +1,222 @@
 
-import { ArrowDown, Check, ShieldCheck, ClipboardCheck, TrendingUp } from "lucide-react";
+import React from "react";
+import { Card, CardContent } from "@/components/ui/card";
 import DashboardCard from "@/components/ui/DashboardCard";
+import { ArrowRight, Check, Shield, FileText as FileTextIcon } from "lucide-react";
 
 const KCBBankCase = () => {
   return (
-    <div className="mt-8 space-y-8">
-      <div className="bg-white rounded-xl shadow-sm p-6 border">
-        <div className="flex items-start gap-4">
-          <div className="w-16 h-16 shrink-0 bg-gray-100 rounded-full flex items-center justify-center">
-            <img 
-              src="https://upload.wikimedia.org/wikipedia/en/thumb/1/19/KCB_Logo.svg/1200px-KCB_Logo.svg.png" 
-              alt="KCB Bank Logo" 
-              className="w-12 h-12 object-contain"
-              onError={(e) => {
-                const target = e.target as HTMLImageElement;
-                target.src = "https://via.placeholder.com/150?text=KCB";
-              }}
-            />
-          </div>
-          <div>
-            <h2 className="text-xl font-bold text-gray-900">KCB Bank Kenya</h2>
-            <p className="text-gray-600 mt-1">
-              Leading East African bank processing 5,000+ payments daily through multiple payment channels
+    <div className="space-y-6">
+      <Card className="border-discrepay-100 bg-gradient-to-r from-gray-50 to-white">
+        <CardContent className="p-6">
+          <div className="mb-4">
+            <h2 className="text-xl font-bold mb-2">KCB Bank Kenya + Discrepay</h2>
+            <p className="text-muted-foreground">
+              How a major East African bank streamlined payment operations and compliance
             </p>
           </div>
-        </div>
-      </div>
-      
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        <div className="lg:col-span-2 space-y-6">
-          <DashboardCard title="Challenge">
-            <div className="prose prose-sm max-w-none">
-              <p>
-                KCB Bank Kenya processes 5,000 payments daily for merchants, vendors, and customers through:
-              </p>
-              <ul className="space-y-2 mt-4">
-                <li className="flex items-start">
-                  <div className="mt-1 mr-2 w-5 h-5 bg-discrepay-100 rounded-full flex items-center justify-center text-discrepay-600">
-                    <CreditCard className="w-3 h-3" />
-                  </div>
-                  <span>Card payments via Paystack</span>
-                </li>
-                <li className="flex items-start">
-                  <div className="mt-1 mr-2 w-5 h-5 bg-discrepay-100 rounded-full flex items-center justify-center text-discrepay-600">
-                    <Database className="w-3 h-3" />
-                  </div>
-                  <span>Bank-to-bank transfers via their Core Banking System (CBS)</span>
-                </li>
-                <li className="flex items-start">
-                  <div className="mt-1 mr-2 w-5 h-5 bg-discrepay-100 rounded-full flex items-center justify-center text-discrepay-600">
-                    <Wallet className="w-3 h-3" />
-                  </div>
-                  <span>Mobile money payouts via M-Pesa API</span>
-                </li>
-                <li className="flex items-start">
-                  <div className="mt-1 mr-2 w-5 h-5 bg-discrepay-100 rounded-full flex items-center justify-center text-discrepay-600">
-                    <Banknote className="w-3 h-3" />
-                  </div>
-                  <span>Incoming SWIFT transfers from abroad</span>
-                </li>
-              </ul>
-              
-              <h4 className="font-semibold mt-6 mb-3 text-red-700">The Problem:</h4>
-              <ul className="space-y-2">
-                <li className="flex items-start">
-                  <div className="mt-1 mr-2 w-5 h-5 bg-red-100 rounded-full flex items-center justify-center text-red-600">
-                    <ArrowDown className="w-3 h-3" />
-                  </div>
-                  <span>Settlements are frequently delayed without visibility</span>
-                </li>
-                <li className="flex items-start">
-                  <div className="mt-1 mr-2 w-5 h-5 bg-red-100 rounded-full flex items-center justify-center text-red-600">
-                    <ArrowDown className="w-3 h-3" />
-                  </div>
-                  <span>Funds don't match the payments initiated</span>
-                </li>
-                <li className="flex items-start">
-                  <div className="mt-1 mr-2 w-5 h-5 bg-red-100 rounded-full flex items-center justify-center text-red-600">
-                    <ArrowDown className="w-3 h-3" />
-                  </div>
-                  <span>Finance teams manually download statements from multiple systems for reconciliation</span>
-                </li>
-                <li className="flex items-start">
-                  <div className="mt-1 mr-2 w-5 h-5 bg-red-100 rounded-full flex items-center justify-center text-red-600">
-                    <ArrowDown className="w-3 h-3" />
-                  </div>
-                  <span>Compliance (AML monitoring) is painful and reactive</span>
-                </li>
-                <li className="flex items-start">
-                  <div className="mt-1 mr-2 w-5 h-5 bg-red-100 rounded-full flex items-center justify-center text-red-600">
-                    <ArrowDown className="w-3 h-3" />
-                  </div>
-                  <span>Audit preparation takes months of manual effort</span>
-                </li>
-              </ul>
+
+          <div className="bg-white rounded-md border p-4 mb-6">
+            <h3 className="font-medium mb-2">Challenge:</h3>
+            <ul className="space-y-2 text-sm">
+              <li className="flex items-start">
+                <span className="text-red-500 mr-2">•</span>
+                <span>Processing 5,000+ daily payments across multiple platforms (Paystack, M-Pesa, SWIFT)</span>
+              </li>
+              <li className="flex items-start">
+                <span className="text-red-500 mr-2">•</span>
+                <span>Manual reconciliation by finance teams through disconnected systems</span>
+              </li>
+              <li className="flex items-start">
+                <span className="text-red-500 mr-2">•</span>
+                <span>Delayed detection of settlement issues and compliance violations</span>
+              </li>
+              <li className="flex items-start">
+                <span className="text-red-500 mr-2">•</span>
+                <span>Time-consuming audit preparation and compliance reporting</span>
+              </li>
+            </ul>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+            <div className="bg-green-50 p-4 rounded-md border border-green-100">
+              <h3 className="font-medium text-green-800 flex items-center mb-2">
+                <Check className="h-4 w-4 mr-1" />
+                Connection
+              </h3>
+              <p className="text-sm">Connected payment processors and bank systems to Discrepay APIs (Paystack, M-Pesa, CBS, SWIFT)</p>
             </div>
-          </DashboardCard>
-          
-          <DashboardCard title="How Discrepay Helps">
-            <div className="space-y-6">
-              <div className="border-l-4 border-discrepay-500 pl-4 py-1">
-                <h4 className="font-semibold text-discrepay-800">Step 1: Connection</h4>
-                <p className="text-gray-600 mt-1">
-                  KCB connects payment processors and bank systems to Discrepay APIs
-                  (Paystack, M-Pesa, internal CBS, SWIFT gateway).
-                </p>
-                <div className="mt-2 flex items-center text-green-700 font-medium">
-                  <Check className="w-4 h-4 mr-1" /> 
-                  <span>Discrepay sees every payment KCB initiates — live</span>
-                </div>
+            <div className="bg-green-50 p-4 rounded-md border border-green-100">
+              <h3 className="font-medium text-green-800 flex items-center mb-2">
+                <Check className="h-4 w-4 mr-1" />
+                Monitoring
+              </h3>
+              <p className="text-sm">Automated tracking of payment instruction → execution → settlement across all channels</p>
+            </div>
+            <div className="bg-green-50 p-4 rounded-md border border-green-100">
+              <h3 className="font-medium text-green-800 flex items-center mb-2">
+                <Check className="h-4 w-4 mr-1" />
+                Compliance
+              </h3>
+              <p className="text-sm">Real-time fraud detection and compliance monitoring with automated alerts</p>
+            </div>
+          </div>
+
+          <h3 className="font-medium mb-3">Before vs After Discrepay:</h3>
+          <div className="overflow-x-auto">
+            <table className="w-full text-sm">
+              <thead>
+                <tr className="border-b">
+                  <th className="pb-2 text-left font-medium">Before Discrepay</th>
+                  <th className="pb-2 text-left font-medium">After Discrepay</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr className="border-b">
+                  <td className="py-3 pr-4">Manual reconciliation using Excel</td>
+                  <td className="py-3 text-green-700">Automated fund flow matching live across systems</td>
+                </tr>
+                <tr className="border-b">
+                  <td className="py-3 pr-4">Missing settlements caught days later</td>
+                  <td className="py-3 text-green-700">Missing settlements flagged instantly</td>
+                </tr>
+                <tr className="border-b">
+                  <td className="py-3 pr-4">Fraud found after damage is done</td>
+                  <td className="py-3 text-green-700">Fraud risks detected real-time, proactively</td>
+                </tr>
+                <tr className="border-b">
+                  <td className="py-3 pr-4">Compliance reporting took months</td>
+                  <td className="py-3 text-green-700">Compliance monitoring and reports ready in clicks</td>
+                </tr>
+                <tr>
+                  <td className="py-3 pr-4">Multiple disconnected systems</td>
+                  <td className="py-3 text-green-700">Unified dashboard with complete visibility</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </CardContent>
+      </Card>
+
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <DashboardCard title="KCB Bank Daily Workflow with Discrepay">
+          <div className="space-y-4 p-2">
+            <div className="flex">
+              <div className="bg-discrepay-100 rounded-full w-8 h-8 flex items-center justify-center text-discrepay-600 font-medium shrink-0">
+                1
               </div>
-              
-              <div className="border-l-4 border-discrepay-500 pl-4 py-1">
-                <h4 className="font-semibold text-discrepay-800">Step 2: Monitoring Funds Flow</h4>
-                <p className="text-gray-600 mt-1">
-                  When KCB initiates a vendor payout through M-Pesa, Discrepay tracks the full 
-                  payment lifecycle from instruction to settlement.
+              <div className="ml-3">
+                <h4 className="font-medium">Login and Dashboard Overview</h4>
+                <p className="text-sm text-muted-foreground mt-1">
+                  KCB finance team logs in and views real-time payment status across all channels
                 </p>
-                <div className="mt-2 space-y-1">
-                  <div className="flex items-center text-green-700 font-medium">
-                    <Check className="w-4 h-4 mr-1" /> 
-                    <span>Discrepay matches instruction → execution → settlement</span>
-                  </div>
-                  <div className="flex items-center text-green-700 font-medium">
-                    <Check className="w-4 h-4 mr-1" /> 
-                    <span>Money discrepancies flagged instantly</span>
-                  </div>
-                </div>
-              </div>
-              
-              <div className="border-l-4 border-discrepay-500 pl-4 py-1">
-                <h4 className="font-semibold text-discrepay-800">Step 3: Compliance and Fraud Detection</h4>
-                <p className="text-gray-600 mt-1">
-                  Discrepay identifies unusual payment patterns and potential compliance issues
-                  in real-time, before they become problems.
-                </p>
-                <div className="mt-2 flex items-center text-green-700 font-medium">
-                  <Check className="w-4 h-4 mr-1" /> 
-                  <span>Compliance team gets real-time alerts, not 3 months later</span>
-                </div>
-              </div>
-              
-              <div className="border-l-4 border-discrepay-500 pl-4 py-1">
-                <h4 className="font-semibold text-discrepay-800">Step 4: Reporting and Dashboards</h4>
-                <p className="text-gray-600 mt-1">
-                  KCB's finance, compliance, and treasury teams access comprehensive dashboards
-                  with real-time insights and audit-ready reports.
-                </p>
-                <div className="mt-2 space-y-1">
-                  <div className="flex items-center text-green-700 font-medium">
-                    <Check className="w-4 h-4 mr-1" /> 
-                    <span>Audit-ready reports without manual effort</span>
-                  </div>
-                  <div className="flex items-center text-green-700 font-medium">
-                    <Check className="w-4 h-4 mr-1" /> 
-                    <span>Automatic daily reports to inbox or systems</span>
-                  </div>
-                </div>
               </div>
             </div>
-          </DashboardCard>
-        </div>
+            
+            <div className="flex">
+              <div className="bg-discrepay-100 rounded-full w-8 h-8 flex items-center justify-center text-discrepay-600 font-medium shrink-0">
+                2
+              </div>
+              <div className="ml-3">
+                <h4 className="font-medium">Review Settlement Alerts</h4>
+                <p className="text-sm text-muted-foreground mt-1">
+                  Check for any delayed or failed settlements from previous day
+                </p>
+              </div>
+            </div>
+            
+            <div className="flex">
+              <div className="bg-discrepay-100 rounded-full w-8 h-8 flex items-center justify-center text-discrepay-600 font-medium shrink-0">
+                3
+              </div>
+              <div className="ml-3">
+                <h4 className="font-medium">Initiate Daily Vendor Payouts</h4>
+                <p className="text-sm text-muted-foreground mt-1">
+                  Upload bulk payment file for 200+ vendor payments across M-Pesa and bank transfers
+                </p>
+              </div>
+            </div>
+            
+            <div className="flex">
+              <div className="bg-discrepay-100 rounded-full w-8 h-8 flex items-center justify-center text-discrepay-600 font-medium shrink-0">
+                4
+              </div>
+              <div className="ml-3">
+                <h4 className="font-medium">Monitor Payment Processing</h4>
+                <p className="text-sm text-muted-foreground mt-1">
+                  Track real-time status of all initiated payments across processors
+                </p>
+              </div>
+            </div>
+            
+            <div className="flex">
+              <div className="bg-discrepay-100 rounded-full w-8 h-8 flex items-center justify-center text-discrepay-600 font-medium shrink-0">
+                5
+              </div>
+              <div className="ml-3">
+                <h4 className="font-medium">Generate End-of-Day Reports</h4>
+                <p className="text-sm text-muted-foreground mt-1">
+                  Download reconciliation reports for accounting and export compliance data
+                </p>
+              </div>
+            </div>
+          </div>
+        </DashboardCard>
         
-        <div className="space-y-6">
-          <DashboardCard title="Results">
-            <div className="space-y-4">
-              <div className="flex items-start">
-                <div className="mr-3 mt-1">
-                  <TrendingUp className="w-5 h-5 text-green-600" />
-                </div>
-                <div>
-                  <h4 className="font-medium">Automated Reconciliation</h4>
-                  <p className="text-sm text-gray-600">
-                    Manual Excel reconciliation replaced with automated fund flow matching across systems
-                  </p>
-                </div>
+        <DashboardCard title="Key Benefits for KCB Bank">
+          <div className="space-y-3 p-2">
+            <div className="flex items-start">
+              <div className="mt-1 text-green-500 mr-2">
+                <Check className="h-5 w-5" />
               </div>
-              
-              <div className="flex items-start">
-                <div className="mr-3 mt-1">
-                  <ClipboardCheck className="w-5 h-5 text-green-600" />
-                </div>
-                <div>
-                  <h4 className="font-medium">Real-Time Settlement Tracking</h4>
-                  <p className="text-sm text-gray-600">
-                    Missing settlements flagged instantly instead of days later
-                  </p>
-                </div>
-              </div>
-              
-              <div className="flex items-start">
-                <div className="mr-3 mt-1">
-                  <ShieldCheck className="w-5 h-5 text-green-600" />
-                </div>
-                <div>
-                  <h4 className="font-medium">Proactive Fraud Detection</h4>
-                  <p className="text-sm text-gray-600">
-                    Fraud risks detected real-time, before damage is done
-                  </p>
-                </div>
-              </div>
-              
-              <div className="flex items-start">
-                <div className="mr-3 mt-1">
-                  <FileText className="w-5 h-5 text-green-600" />
-                </div>
-                <div>
-                  <h4 className="font-medium">Simplified Compliance</h4>
-                  <p className="text-sm text-gray-600">
-                    Compliance reporting reduced from months to clicks
-                  </p>
-                </div>
-              </div>
-              
-              <div className="flex items-start">
-                <div className="mr-3 mt-1">
-                  <Database className="w-5 h-5 text-green-600" />
-                </div>
-                <div>
-                  <h4 className="font-medium">Unified System View</h4>
-                  <p className="text-sm text-gray-600">
-                    Connected view across M-Pesa, SWIFT, CBS, and Paystack
-                  </p>
-                </div>
+              <div>
+                <h4 className="font-medium">80% Reduction in Manual Reconciliation</h4>
+                <p className="text-sm text-muted-foreground">
+                  Finance team time freed up for strategic activities instead of Excel reconciliation
+                </p>
               </div>
             </div>
-          </DashboardCard>
-          
-          <DashboardCard title="Quote">
-            <div className="italic text-gray-600 border-l-4 pl-4 py-2 border-gray-200">
-              "Discrepay gives us complete visibility into our payment operations. What used to take our 
-              finance team days now happens automatically, and we catch settlement issues before they 
-              impact our customers."
-              <div className="mt-2 text-discrepay-800 font-medium not-italic">
-                - Head of Treasury Operations, KCB Bank
+            
+            <div className="flex items-start">
+              <div className="mt-1 text-green-500 mr-2">
+                <Shield className="h-5 w-5" />
+              </div>
+              <div>
+                <h4 className="font-medium">95% Faster Fraud Detection</h4>
+                <p className="text-sm text-muted-foreground">
+                  Potential issues identified within minutes instead of days or weeks
+                </p>
               </div>
             </div>
-          </DashboardCard>
-        </div>
+            
+            <div className="flex items-start">
+              <div className="mt-1 text-green-500 mr-2">
+                <ArrowRight className="h-5 w-5" />
+              </div>
+              <div>
+                <h4 className="font-medium">99.2% Settlement Match Rate</h4>
+                <p className="text-sm text-muted-foreground">
+                  Near-perfect visibility and matching of payments to settlements
+                </p>
+              </div>
+            </div>
+            
+            <div className="flex items-start">
+              <div className="mt-1 text-green-500 mr-2">
+                <FileTextIcon className="h-5 w-5" />
+              </div>
+              <div>
+                <h4 className="font-medium">Audit-Ready in Minutes</h4>
+                <p className="text-sm text-muted-foreground">
+                  Compliance reports generated on-demand for Central Bank and auditors
+                </p>
+              </div>
+            </div>
+          </div>
+        </DashboardCard>
       </div>
     </div>
   );
 };
 
 export default KCBBankCase;
-
-// Add missing imports
-import { CreditCard, Database, Wallet, Banknote } from "lucide-react";
