@@ -1,8 +1,11 @@
-
-import { ChartBar } from "lucide-react";
+import { ChartBar, ArrowRight } from "lucide-react";
 import DashboardCard from "../ui/DashboardCard";
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";
 import { Progress } from "@/components/ui/progress";
+import { Button } from "@/components/ui/button";
+import { useNavigate } from "react-router-dom";
+import FailureCauses from "./FailureCauses";
+import SettlementMetrics from "./SettlementMetrics";
 
 const data = [
   { name: "Jan", value: 1200000 },
@@ -21,21 +24,55 @@ interface StatCardProps {
   icon: React.ReactNode;
 }
 
+const sparklineData = [
+  { day: "Mon", value: 320 },
+  { day: "Tue", value: 350 },
+  { day: "Wed", value: 290 },
+  { day: "Thu", value: 400 },
+  { day: "Fri", value: 380 },
+  { day: "Sat", value: 320 },
+  { day: "Sun", value: 345 },
+];
+
+const MiniSparkline = () => (
+  <div className="h-8 w-16">
+    <ResponsiveContainer width="100%" height="100%">
+      <AreaChart data={sparklineData} margin={{ top: 0, right: 0, left: 0, bottom: 0 }}>
+        <Area type="monotone" dataKey="value" stroke="#0c8de4" fill="#e0eefe" />
+      </AreaChart>
+    </ResponsiveContainer>
+  </div>
+);
+
 const StatCard = ({ title, value, change, icon }: StatCardProps) => {
+  const navigate = useNavigate();
+  
   return (
     <div className="bg-white p-4 rounded-lg shadow-sm">
       <div className="flex justify-between items-start">
         <div>
           <p className="text-sm text-gray-500">{title}</p>
           <p className="text-2xl font-semibold mt-1">{value}</p>
-          <div className={`text-xs mt-2 ${change >= 0 ? 'text-green-600' : 'text-red-600'} flex items-center`}>
-            {change >= 0 ? '↑' : '↓'} {Math.abs(change)}% from previous period
+          <div className="flex items-center gap-2">
+            <div className={`text-xs mt-2 ${change >= 0 ? 'text-green-600' : 'text-red-600'} flex items-center`}>
+              {change >= 0 ? '↑' : '↓'} {Math.abs(change)}% from previous period
+            </div>
+            <MiniSparkline />
           </div>
         </div>
         <div className="p-2 bg-blue-50 text-discrepay-600 rounded-md">
           {icon}
         </div>
       </div>
+      {(title === "Pending Settlements" || title === "Failed Transactions") && (
+        <Button 
+          variant="link" 
+          className="mt-2 p-0 h-auto text-sm text-discrepay-600"
+          onClick={() => navigate('/settlements')}
+        >
+          Investigate <ArrowRight className="h-4 w-4 ml-1" />
+        </Button>
+      )}
     </div>
   );
 };
@@ -165,7 +202,6 @@ const FinancialSummary = () => {
   );
 };
 
-// Add missing imports
 import { Wallet, CreditCard, ShieldCheck } from "lucide-react";
 
 export default FinancialSummary;
