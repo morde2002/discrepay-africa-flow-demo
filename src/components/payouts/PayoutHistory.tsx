@@ -3,9 +3,17 @@ import { useState } from "react";
 import DashboardCard from "@/components/ui/DashboardCard";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Search } from "lucide-react";
+import { Search, Download, FileText } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
 
 // Sample payout data
 const payouts = [
@@ -13,6 +21,8 @@ const payouts = [
     id: "PO-2025042701",
     date: "2025-04-27T10:15:22",
     amount: 9500000,
+    processorFee: 237500,
+    netAmount: 9262500,
     status: "completed",
     type: "utility",
     recipient: "Ikeja Electric",
@@ -22,6 +32,8 @@ const payouts = [
     id: "PO-2025042702",
     date: "2025-04-27T10:15:22",
     amount: 4300000,
+    processorFee: 107500,
+    netAmount: 4192500,
     status: "completed",
     type: "utility",
     recipient: "Eko Electric",
@@ -31,6 +43,8 @@ const payouts = [
     id: "PO-2025042603",
     date: "2025-04-26T16:45:18",
     amount: 2850000,
+    processorFee: 71250,
+    netAmount: 2778750,
     status: "processing",
     type: "utility",
     recipient: "Ibadan DISCO",
@@ -40,6 +54,8 @@ const payouts = [
     id: "PO-2025042504",
     date: "2025-04-25T14:30:47",
     amount: 3200000,
+    processorFee: 80000,
+    netAmount: 3120000,
     status: "failed",
     type: "utility",
     recipient: "Abuja Electric",
@@ -49,6 +65,8 @@ const payouts = [
     id: "PO-2025042405",
     date: "2025-04-24T11:20:05",
     amount: 2150000,
+    processorFee: 53750,
+    netAmount: 2096250,
     status: "completed",
     type: "utility",
     recipient: "Port Harcourt Electric",
@@ -100,11 +118,23 @@ const PayoutHistory = () => {
     salary: "Salary",
   };
 
+  const formatCurrency = (amount: number) => {
+    return new Intl.NumberFormat('en-NG', { 
+      style: 'currency', 
+      currency: 'NGN',
+      minimumFractionDigits: 0,
+      maximumFractionDigits: 0 
+    }).format(amount);
+  };
+
   return (
     <DashboardCard 
       title="Recent Payouts"
       action={
-        <Button variant="outline" size="sm">Download Report</Button>
+        <Button variant="outline" size="sm">
+          <Download className="h-4 w-4 mr-1" />
+          Export
+        </Button>
       }
       className="mt-6"
     >
@@ -136,50 +166,62 @@ const PayoutHistory = () => {
         </div>
 
         <div className="overflow-x-auto">
-          <table className="w-full">
-            <thead>
-              <tr className="text-xs text-muted-foreground border-b">
-                <th className="text-left font-medium p-2">Payout ID</th>
-                <th className="text-left font-medium p-2">Date & Time</th>
-                <th className="text-left font-medium p-2">Amount</th>
-                <th className="text-left font-medium p-2">Type</th>
-                <th className="text-left font-medium p-2">Recipient</th>
-                <th className="text-left font-medium p-2">Status</th>
-                <th className="text-left font-medium p-2">Actions</th>
-              </tr>
-            </thead>
-            <tbody>
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead>Payout ID</TableHead>
+                <TableHead>Date & Time</TableHead>
+                <TableHead>Amount</TableHead>
+                <TableHead>Processor Fee</TableHead>
+                <TableHead>Net Amount</TableHead>
+                <TableHead>Type</TableHead>
+                <TableHead>Recipient</TableHead>
+                <TableHead>Status</TableHead>
+                <TableHead>Actions</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
               {filteredPayouts.map((payout) => (
-                <tr key={payout.id} className="border-b hover:bg-muted/50 text-sm">
-                  <td className="p-2 font-medium">{payout.id}</td>
-                  <td className="p-2">{formatDate(payout.date)}</td>
-                  <td className="p-2 font-medium">₦{(payout.amount / 1000).toFixed(1)}K</td>
-                  <td className="p-2">{typeLabels[payout.type]}</td>
-                  <td className="p-2">{payout.recipient}</td>
-                  <td className="p-2">
+                <TableRow key={payout.id} className="hover:bg-muted/50">
+                  <TableCell className="font-medium">{payout.id}</TableCell>
+                  <TableCell>{formatDate(payout.date)}</TableCell>
+                  <TableCell>{formatCurrency(payout.amount)}</TableCell>
+                  <TableCell className="text-muted-foreground">{formatCurrency(payout.processorFee)}</TableCell>
+                  <TableCell className="font-medium">{formatCurrency(payout.netAmount)}</TableCell>
+                  <TableCell>{typeLabels[payout.type]}</TableCell>
+                  <TableCell>{payout.recipient}</TableCell>
+                  <TableCell>
                     <Badge variant="outline" className={statusColors[payout.status]}>
                       {payout.status.charAt(0).toUpperCase() + payout.status.slice(1)}
                     </Badge>
-                  </td>
-                  <td className="p-2">
-                    <button className="text-discrepay-600 hover:text-discrepay-800 text-xs underline mr-2">
-                      View
-                    </button>
-                    <button className="text-discrepay-600 hover:text-discrepay-800 text-xs underline">
-                      Receipt
-                    </button>
-                  </td>
-                </tr>
+                  </TableCell>
+                  <TableCell>
+                    <div className="flex space-x-2">
+                      <Button variant="ghost" size="sm" className="h-8 px-2 text-xs">
+                        View
+                      </Button>
+                      <Button variant="ghost" size="sm" className="h-8 px-2 text-xs">
+                        <FileText className="h-3 w-3 mr-1" />
+                        Report
+                      </Button>
+                      {payout.status === "failed" && (
+                        <Button variant="ghost" size="sm" className="h-8 px-2 text-xs text-red-600 hover:text-red-700 hover:bg-red-50">
+                          Retry
+                        </Button>
+                      )}
+                    </div>
+                  </TableCell>
+                </TableRow>
               ))}
               {filteredPayouts.length === 0 && (
-                <tr>
-                  <td colSpan={7} className="text-center p-4 text-muted-foreground">
+                <TableRow>
+                  <TableCell colSpan={9} className="text-center p-4 text-muted-foreground">
                     No payouts found matching your filters
-                  </td>
-                </tr>
+                  </TableCell>
+                </TableRow>
               )}
-            </tbody>
-          </table>
+            </TableBody>
+          </Table>
         </div>
       </div>
     </DashboardCard>
