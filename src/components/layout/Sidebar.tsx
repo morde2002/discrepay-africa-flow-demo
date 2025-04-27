@@ -20,7 +20,6 @@ import {
   Database,
   Settings, 
   ShieldCheck,
-  FileText,
   LogOut,
   User
 } from "lucide-react";
@@ -62,12 +61,6 @@ const SidebarNav = () => {
       title: "Compliance",
       icon: ShieldCheck,
       url: "/compliance",
-    },
-    {
-      id: "user-flows",
-      title: "User Flows",
-      icon: FileText,
-      url: "/user-flows",
     },
   ];
 

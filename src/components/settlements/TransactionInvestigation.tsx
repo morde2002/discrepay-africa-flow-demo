@@ -1,4 +1,5 @@
 
+import React, { useState } from "react";
 import {
   Drawer,
   DrawerContent,
@@ -15,7 +16,6 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Clock, Info, AlertTriangle } from "lucide-react";
-import { useState } from "react";
 
 type TransactionEvent = {
   timestamp: string;
