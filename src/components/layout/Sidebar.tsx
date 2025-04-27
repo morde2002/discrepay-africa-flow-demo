@@ -1,5 +1,5 @@
 
-import { useState } from "react";
+import React from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import {
   Sidebar,
@@ -68,9 +68,11 @@ const SidebarNav = () => {
     <Sidebar>
       <SidebarHeader className="py-6 px-4">
         <div className="flex items-center space-x-2">
-          <div className="w-8 h-8 rounded-md bg-discrepay-500 flex items-center justify-center text-white font-bold text-lg">
-            D
-          </div>
+          <img 
+            src="/lovable-uploads/c6b58a34-ac83-45c0-8be4-4c26b436414d.png" 
+            alt="Discrepay Logo" 
+            className="w-8 h-8 object-contain"
+          />
           <span className="font-bold text-lg text-white">Discrepay</span>
         </div>
       </SidebarHeader>
@@ -143,3 +145,4 @@ const SidebarNav = () => {
 };
 
 export default SidebarNav;
+
