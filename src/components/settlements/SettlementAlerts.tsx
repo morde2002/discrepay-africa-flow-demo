@@ -1,6 +1,6 @@
-
 import DashboardCard from "@/components/ui/DashboardCard";
 import { Badge } from "@/components/ui/badge";
+import { TransactionInvestigation } from "./TransactionInvestigation";
 
 const alerts = [
   {
@@ -86,9 +86,7 @@ const SettlementAlerts = () => {
                 <td className="p-2">{alert.processor}</td>
                 <td className="p-2">{alert.time}</td>
                 <td className="p-2">
-                  <button className="text-discrepay-600 hover:text-discrepay-800 underline text-xs">
-                    Investigate
-                  </button>
+                  <TransactionInvestigation transactionId={alert.reference} />
                 </td>
               </tr>
             ))}
