@@ -1,11 +1,13 @@
 
 import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
 import SidebarNav from "@/components/layout/Sidebar";
-import { Bell, Search, Settings } from "lucide-react";
+import { Bell, Search, Settings, Download } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import SettlementMonitoring from "@/components/settlements/SettlementMonitoring";
 import SettlementAlerts from "@/components/settlements/SettlementAlerts";
+import FundsFlowTracker from "@/components/settlements/FundsFlowTracker";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 const Settlements = () => {
   return (
@@ -19,6 +21,10 @@ const Settlements = () => {
               <div className="ml-4 text-lg font-medium">Settlements</div>
             </div>
             <div className="flex items-center space-x-4">
+              <Button variant="outline" size="sm" className="hidden md:flex">
+                <Download className="h-4 w-4 mr-2" />
+                Generate Report
+              </Button>
               <div className="relative hidden md:block">
                 <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
                 <input
@@ -45,8 +51,22 @@ const Settlements = () => {
               <p className="text-muted-foreground">Track and monitor all payment settlements across your financial ecosystem.</p>
             </div>
             
-            <SettlementMonitoring />
-            <SettlementAlerts />
+            <Tabs defaultValue="dashboard" className="mb-6">
+              <TabsList>
+                <TabsTrigger value="dashboard">Dashboard</TabsTrigger>
+                <TabsTrigger value="funds-flow">Funds Flow Tracker</TabsTrigger>
+                <TabsTrigger value="alerts">Settlement Alerts</TabsTrigger>
+              </TabsList>
+              <TabsContent value="dashboard" className="mt-6">
+                <SettlementMonitoring />
+              </TabsContent>
+              <TabsContent value="funds-flow" className="mt-6">
+                <FundsFlowTracker />
+              </TabsContent>
+              <TabsContent value="alerts" className="mt-6">
+                <SettlementAlerts />
+              </TabsContent>
+            </Tabs>
           </main>
         </div>
       </div>

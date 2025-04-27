@@ -1,3 +1,4 @@
+
 import DashboardCard from "@/components/ui/DashboardCard";
 import { Badge } from "@/components/ui/badge";
 import { TransactionInvestigation } from "./TransactionInvestigation";
@@ -11,7 +12,10 @@ const alerts = [
     amount: "₦245,700",
     time: "2 hours ago",
     expected: "10:00 AM",
-    processor: "Paystack"
+    processor: "Paystack",
+    status: "missing",
+    variance: "₦245,700",
+    fee: "₦6,143",
   },
   {
     id: "ST002",
@@ -21,27 +25,36 @@ const alerts = [
     amount: "₦128,500",
     time: "4 hours ago",
     expected: "08:30 AM",
-    processor: "Flutterwave"
+    processor: "Flutterwave",
+    status: "delayed",
+    variance: "Delayed",
+    fee: "₦3,598",
   },
   {
     id: "ST003",
     severity: "low",
     message: "Settlement variance detected",
     reference: "TX937712",
-    amount: "₦2,300",
+    amount: "₦75,250",
     time: "Yesterday",
-    expected: "₦75,250",
-    processor: "Direct Bank"
+    expected: "14:45 PM",
+    processor: "Direct Bank",
+    status: "partial",
+    variance: "₦1,171",
+    fee: "₦1,129",
   },
   {
     id: "ST004",
     severity: "high",
     message: "Multiple failed settlements",
-    reference: "Multi (5)",
+    reference: "Multi",
     amount: "₦534,200",
     time: "Yesterday",
-    expected: "Various",
-    processor: "Interswitch"
+    expected: "09:30 AM",
+    processor: "Interswitch",
+    status: "missing",
+    variance: "₦534,200",
+    fee: "₦11,752",
   }
 ];
 
@@ -58,6 +71,8 @@ const SettlementAlerts = () => {
               <th className="text-left font-medium p-2">Transaction Ref</th>
               <th className="text-left font-medium p-2">Amount</th>
               <th className="text-left font-medium p-2">Processor</th>
+              <th className="text-left font-medium p-2">Processor Fee</th>
+              <th className="text-left font-medium p-2">Variance</th>
               <th className="text-left font-medium p-2">Time</th>
               <th className="text-left font-medium p-2">Action</th>
             </tr>
@@ -84,6 +99,21 @@ const SettlementAlerts = () => {
                 <td className="p-2">{alert.reference}</td>
                 <td className="p-2">{alert.amount}</td>
                 <td className="p-2">{alert.processor}</td>
+                <td className="p-2">{alert.fee}</td>
+                <td className="p-2">
+                  <Badge 
+                    variant="outline" 
+                    className={
+                      alert.status === "missing" 
+                        ? "bg-red-100 text-red-800" 
+                        : alert.status === "delayed" 
+                        ? "bg-amber-100 text-amber-800" 
+                        : "bg-orange-100 text-orange-800"
+                    }
+                  >
+                    {alert.variance}
+                  </Badge>
+                </td>
                 <td className="p-2">{alert.time}</td>
                 <td className="p-2">
                   <TransactionInvestigation transactionId={alert.reference} />
