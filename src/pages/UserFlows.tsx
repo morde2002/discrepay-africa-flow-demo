@@ -7,6 +7,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import MoveMoneyFlow from "@/components/userflows/MoveMoneyFlow";
 import MonitorTrackFlow from "@/components/userflows/MonitorTrackFlow";
+import MonitoringFlow from "@/components/userflows/MonitoringFlow";
 
 const UserFlows = () => {
   return (
@@ -52,12 +53,16 @@ const UserFlows = () => {
               <TabsList>
                 <TabsTrigger value="move-money">Move Money End-to-End</TabsTrigger>
                 <TabsTrigger value="monitor-track">Monitor, Track, and Settle</TabsTrigger>
+                <TabsTrigger value="monitoring-only">Customer Monitoring Journey</TabsTrigger>
               </TabsList>
               <TabsContent value="move-money">
                 <MoveMoneyFlow />
               </TabsContent>
               <TabsContent value="monitor-track">
                 <MonitorTrackFlow />
+              </TabsContent>
+              <TabsContent value="monitoring-only">
+                <MonitoringFlow />
               </TabsContent>
             </Tabs>
           </main>
