@@ -11,6 +11,7 @@ import Settlements from "./pages/Settlements";
 import Payouts from "./pages/Payouts";
 import Compliance from "./pages/Compliance";
 import Reconciliation from "./pages/Reconciliation";
+import Invoices from "./pages/Invoices";
 import NotFound from "./pages/NotFound";
 import Auth from "./pages/Auth";
 
@@ -53,6 +54,11 @@ const App: React.FC = () => {
               <Route path="/reconciliation" element={
                 <ProtectedRoute>
                   <Reconciliation />
+                </ProtectedRoute>
+              } />
+              <Route path="/invoices" element={
+                <ProtectedRoute>
+                  <Invoices />
                 </ProtectedRoute>
               } />
               

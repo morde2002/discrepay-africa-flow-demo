@@ -67,8 +67,14 @@ const SidebarNav = () => {
     {
       id: "reconciliation",
       title: "Reconciliation",
-      icon: FileText,
+      icon: Database,
       url: "/reconciliation",
+    },
+    {
+      id: "invoices",
+      title: "Invoices",
+      icon: FileText,
+      url: "/invoices",
     },
   ];
 
