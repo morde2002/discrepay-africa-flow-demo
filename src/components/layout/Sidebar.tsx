@@ -21,7 +21,8 @@ import {
   Settings, 
   ShieldCheck,
   LogOut,
-  User
+  User,
+  FileText
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
@@ -33,6 +34,7 @@ const SidebarNav = () => {
   const pathname = location.pathname;
   
   const handleLogout = () => {
+    localStorage.setItem('isAuthenticated', 'false');
     toast.success("Logged out successfully");
     navigate("/auth");
   };
@@ -61,6 +63,12 @@ const SidebarNav = () => {
       title: "Compliance",
       icon: ShieldCheck,
       url: "/compliance",
+    },
+    {
+      id: "reconciliation",
+      title: "Reconciliation",
+      icon: FileText,
+      url: "/reconciliation",
     },
   ];
 
@@ -145,4 +153,3 @@ const SidebarNav = () => {
 };
 
 export default SidebarNav;
-
