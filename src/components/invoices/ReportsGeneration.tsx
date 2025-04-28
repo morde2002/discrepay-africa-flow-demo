@@ -258,7 +258,9 @@ export const ReportsGeneration: React.FC = () => {
                       checked={includeReviewComments}
                       onCheckedChange={(checked) => setIncludeReviewComments(checked as boolean)}
                     />
-                    <Label htmlFor="include-review-summary">Include review comments</Label>
+                    <Label htmlFor="include-review-summary">
+                      Include review comments
+                    </Label>
                   </div>
                 </div>
               </div>
@@ -284,7 +286,9 @@ export const ReportsGeneration: React.FC = () => {
                       checked={true}
                       disabled
                     />
-                    <Label htmlFor="include-full-details-matched">Include full transaction details</Label>
+                    <Label htmlFor="include-full-details-matched">
+                      Include full transaction details
+                    </Label>
                   </div>
                   
                   <div className="flex items-center space-x-2">
@@ -293,7 +297,9 @@ export const ReportsGeneration: React.FC = () => {
                       checked={true}
                       disabled
                     />
-                    <Label htmlFor="include-date-matched">Include match date</Label>
+                    <Label htmlFor="include-date-matched">
+                      Include match date
+                    </Label>
                   </div>
                 </div>
               </div>
@@ -319,7 +325,9 @@ export const ReportsGeneration: React.FC = () => {
                       checked={true}
                       disabled
                     />
-                    <Label htmlFor="include-partial-matches">Partial matches</Label>
+                    <Label htmlFor="include-partial-matches">
+                      Partial matches
+                    </Label>
                   </div>
                   
                   <div className="flex items-center space-x-2">
@@ -328,7 +336,9 @@ export const ReportsGeneration: React.FC = () => {
                       checked={true}
                       disabled
                     />
-                    <Label htmlFor="include-unmatched-invoices">Unmatched invoices</Label>
+                    <Label htmlFor="include-unmatched-invoices">
+                      Unmatched invoices
+                    </Label>
                   </div>
                   
                   <div className="flex items-center space-x-2">
@@ -337,7 +347,9 @@ export const ReportsGeneration: React.FC = () => {
                       checked={true}
                       disabled
                     />
-                    <Label htmlFor="include-unmatched-payments">Unmatched payments</Label>
+                    <Label htmlFor="include-unmatched-payments">
+                      Unmatched payments
+                    </Label>
                   </div>
                   
                   <div className="flex items-center space-x-2">
@@ -346,7 +358,9 @@ export const ReportsGeneration: React.FC = () => {
                       checked={includeReviewComments}
                       onCheckedChange={(checked) => setIncludeReviewComments(checked as boolean)}
                     />
-                    <Label htmlFor="include-review-comments-unmatched">Include review comments</Label>
+                    <Label htmlFor="include-review-comments-unmatched">
+                      Include review comments
+                    </Label>
                   </div>
                 </div>
               </div>
@@ -372,7 +386,9 @@ export const ReportsGeneration: React.FC = () => {
                       checked={includeAll}
                       onCheckedChange={(checked) => setIncludeAll(checked as boolean)}
                     />
-                    <Label htmlFor="include-all">All items</Label>
+                    <Label htmlFor="include-all">
+                      All items
+                    </Label>
                   </div>
                   
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-2 pl-6">
@@ -383,7 +399,9 @@ export const ReportsGeneration: React.FC = () => {
                         onCheckedChange={(checked) => setIncludeMatched(checked as boolean)}
                         disabled={includeAll}
                       />
-                      <Label htmlFor="include-matched-custom">Matched transactions</Label>
+                      <Label htmlFor="include-matched-custom">
+                        Matched transactions
+                      </Label>
                     </div>
                     
                     <div className="flex items-center space-x-2">
@@ -393,7 +411,9 @@ export const ReportsGeneration: React.FC = () => {
                         onCheckedChange={(checked) => setIncludePartial(checked as boolean)}
                         disabled={includeAll}
                       />
-                      <Label htmlFor="include-partial-custom">Partial matches</Label>
+                      <Label htmlFor="include-partial-custom">
+                        Partial matches
+                      </Label>
                     </div>
                     
                     <div className="flex items-center space-x-2">
@@ -403,7 +423,9 @@ export const ReportsGeneration: React.FC = () => {
                         onCheckedChange={(checked) => setIncludeUnmatchedInvoices(checked as boolean)}
                         disabled={includeAll}
                       />
-                      <Label htmlFor="include-unmatched-invoices-custom">Unmatched invoices</Label>
+                      <Label htmlFor="include-unmatched-invoices-custom">
+                        Unmatched invoices
+                      </Label>
                     </div>
                     
                     <div className="flex items-center space-x-2">
@@ -413,7 +435,9 @@ export const ReportsGeneration: React.FC = () => {
                         onCheckedChange={(checked) => setIncludeUnmatchedPayments(checked as boolean)}
                         disabled={includeAll}
                       />
-                      <Label htmlFor="include-unmatched-payments-custom">Unmatched payments</Label>
+                      <Label htmlFor="include-unmatched-payments-custom">
+                        Unmatched payments
+                      </Label>
                     </div>
                     
                     <div className="flex items-center space-x-2">
@@ -423,7 +447,9 @@ export const ReportsGeneration: React.FC = () => {
                         onCheckedChange={(checked) => setIncludeDuplicates(checked as boolean)}
                         disabled={includeAll}
                       />
-                      <Label htmlFor="include-duplicates-custom">Duplicate payments</Label>
+                      <Label htmlFor="include-duplicates-custom">
+                        Duplicate payments
+                      </Label>
                     </div>
                   </div>
                   
@@ -433,7 +459,9 @@ export const ReportsGeneration: React.FC = () => {
                       checked={includeReviewComments}
                       onCheckedChange={(checked) => setIncludeReviewComments(checked as boolean)}
                     />
-                    <Label htmlFor="include-review-comments-custom">Include review comments</Label>
+                    <Label htmlFor="include-review-comments-custom">
+                      Include review comments
+                    </Label>
                   </div>
                 </div>
               </div>
@@ -494,11 +522,4 @@ const AlertTriangle = (props: React.SVGProps<SVGSVGElement>) => (
     <line x1="12" y1="9" x2="12" y2="13" />
     <line x1="12" y1="17" x2="12.01" y2="17" />
   </svg>
-);
-
-// Helper Label component
-const Label: React.FC<React.HTMLAttributes<HTMLDivElement>> = ({ children, className, ...props }) => (
-  <div className={`text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 ${className}`} {...props}>
-    {children}
-  </div>
 );

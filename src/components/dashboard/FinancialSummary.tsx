@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
@@ -64,11 +65,22 @@ const CHART_DATA = {
 };
 
 // ==================== Reusable Components ====================
-const AnimatedContainer = ({ children, delay = 0 }) => (
+interface AnimatedContainerProps {
+  children: React.ReactNode;
+  delay?: number;
+  className?: string;
+}
+
+const AnimatedContainer: React.FC<AnimatedContainerProps> = ({ 
+  children, 
+  delay = 0,
+  className 
+}) => (
   <motion.div
     initial={{ opacity: 0, y: 20 }}
     animate={{ opacity: 1, y: 0 }}
     transition={{ duration: 0.4, delay }}
+    className={className}
   >
     {children}
   </motion.div>
@@ -88,7 +100,15 @@ const MiniSparkline = () => (
   </ResponsiveContainer>
 );
 
-const StatCard = ({ title, value, change, icon, link }) => {
+interface StatCardProps {
+  title: string;
+  value: string;
+  change: number;
+  icon: React.ReactNode;
+  link: string | null;
+}
+
+const StatCard: React.FC<StatCardProps> = ({ title, value, change, icon, link }) => {
   const navigate = useNavigate();
   const trendColor = change >= 0 ? 'text-green-600' : 'text-red-600';
   const TrendArrow = change >= 0 ? '↑' : '↓';
@@ -117,7 +137,7 @@ const StatCard = ({ title, value, change, icon, link }) => {
       {link && (
         <Button
           variant="ghost"
-          className="mt-4 text-sm w-full flex justify-between items-center text-blue-600 hover:text-blue-700"
+          className="mt-4 text-sm w-full justify-between items-center text-blue-600 hover:text-blue-700"
           onClick={() => navigate(link)}
           aria-label={`View ${title} details`}
         >
@@ -147,7 +167,7 @@ const FinancialOverviewChart = () => (
           <CartesianGrid strokeDasharray="3 3" vertical={false} />
           <XAxis dataKey="name" tickLine={false} />
           <YAxis tickFormatter={v => `$${v / 1000}k`} tickLine={false} />
-          <Tooltip formatter={v => [`$${(v / 1000).toFixed(1)}k`, 'Volume']} />
+          <Tooltip formatter={(v: any) => [`$${(v / 1000).toFixed(1)}k`, 'Volume']} />
           <Area
             type="monotone"
             dataKey="value"
@@ -168,7 +188,7 @@ const FinancialOverviewChart = () => (
 );
 
 const SourcePieChart = () => (
-  <DashboardCard title="Transaction Sources" icon={<PieIcon className="h-5 w-5 text-purple-500" />}>
+  <DashboardCard title="Transaction Sources">
     <div className="h-72 flex items-center justify-center">
       <ResponsiveContainer>
         <PieChart>
@@ -194,14 +214,14 @@ const SourcePieChart = () => (
 );
 
 const SettlementTrendsChart = () => (
-  <DashboardCard title="Settlement Trends" icon={<Banknote className="h-5 w-5 text-green-500" />}>
+  <DashboardCard title="Settlement Trends">
     <div className="h-72">
       <ResponsiveContainer>
         <BarChart data={CHART_DATA.settlements}>
           <CartesianGrid strokeDasharray="3 3" />
           <XAxis dataKey="month" />
           <YAxis tickFormatter={v => `$${v / 1000}k`} />
-          <Tooltip formatter={v => `$${v.toLocaleString()}`} />
+          <Tooltip formatter={(v: any) => `$${v.toLocaleString()}`} />
           <Bar dataKey="completed" stackId="a" fill={CHART_COLORS[1]} name="Completed" />
           <Bar dataKey="pending" stackId="a" fill={CHART_COLORS[2]} name="Pending" />
         </BarChart>

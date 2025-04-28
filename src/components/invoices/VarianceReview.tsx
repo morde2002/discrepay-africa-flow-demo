@@ -13,6 +13,7 @@ import { Input } from "@/components/ui/input";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
 import { Search, Tag, Check, X } from "lucide-react";
 
@@ -205,7 +206,7 @@ export const VarianceReview: React.FC = () => {
         <CardContent>
           <div className="flex flex-col sm:flex-row gap-4 mb-6">
             <div className="flex-1">
-              <Label>Filter by Category</Label>
+              <div className="text-sm font-medium leading-none mb-2">Filter by Category</div>
               <Select value={filter} onValueChange={setFilter}>
                 <SelectTrigger>
                   <SelectValue placeholder="Filter by category" />
@@ -225,7 +226,7 @@ export const VarianceReview: React.FC = () => {
             </div>
             
             <div className="flex-1">
-              <Label>Search</Label>
+              <div className="text-sm font-medium leading-none mb-2">Search</div>
               <div className="relative">
                 <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-gray-500" />
                 <Input
@@ -331,29 +332,29 @@ export const VarianceReview: React.FC = () => {
           <div className="space-y-4 py-4">
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <Label className="text-xs text-gray-500">Invoice Number</Label>
+                <div className="text-xs text-gray-500">Invoice Number</div>
                 <div className="font-medium">{selectedResult?.invoice?.invoiceNumber || 'N/A'}</div>
               </div>
               <div>
-                <Label className="text-xs text-gray-500">Payment Reference</Label>
+                <div className="text-xs text-gray-500">Payment Reference</div>
                 <div className="font-medium">{selectedResult?.payment?.paymentReference || 'N/A'}</div>
               </div>
             </div>
             
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <Label className="text-xs text-gray-500">Invoice Amount</Label>
+                <div className="text-xs text-gray-500">Invoice Amount</div>
                 <div className="font-medium">{formatCurrency(selectedResult?.invoice?.amount)}</div>
               </div>
               <div>
-                <Label className="text-xs text-gray-500">Payment Amount</Label>
+                <div className="text-xs text-gray-500">Payment Amount</div>
                 <div className="font-medium">{formatCurrency(selectedResult?.payment?.amount)}</div>
               </div>
             </div>
             
             {selectedResult?.difference !== undefined && (
               <div>
-                <Label className="text-xs text-gray-500">Difference</Label>
+                <div className="text-xs text-gray-500">Difference</div>
                 <div className={`font-medium ${selectedResult.difference > 0 ? 'text-green-600' : 'text-red-600'}`}>
                   {formatCurrency(selectedResult.difference)}
                 </div>
@@ -418,10 +419,3 @@ export const VarianceReview: React.FC = () => {
     </div>
   );
 };
-
-// Helper Label component
-const Label: React.FC<React.HTMLAttributes<HTMLDivElement>> = ({ children, className, ...props }) => (
-  <div className={`text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 mb-2 ${className}`} {...props}>
-    {children}
-  </div>
-);
