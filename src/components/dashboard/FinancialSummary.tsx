@@ -1,207 +1,278 @@
-import { ChartBar, ArrowRight } from "lucide-react";
-import DashboardCard from "../ui/DashboardCard";
-import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";
-import { Progress } from "@/components/ui/progress";
-import { Button } from "@/components/ui/button";
-import { useNavigate } from "react-router-dom";
-import FailureCauses from "./FailureCauses";
-import SettlementMetrics from "./SettlementMetrics";
+import React from 'react';
+import { useNavigate } from 'react-router-dom';
+import { motion } from 'framer-motion';
+import {
+  AreaChart, Area, Line, BarChart, Bar, PieChart, Pie, Cell,
+  XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer
+} from 'recharts';
+import {
+  ChartBar, Wallet, CreditCard, ShieldCheck,
+  PieChart as PieIcon, Banknote, ArrowRight
+} from 'lucide-react';
+import DashboardCard from '../ui/DashboardCard';
+import { Progress } from '@/components/ui/progress';
+import { Button } from '@/components/ui/button';
 
-const data = [
-  { name: "Jan", value: 1200000 },
-  { name: "Feb", value: 1900000 },
-  { name: "Mar", value: 3000000 },
-  { name: "Apr", value: 2780000 },
-  { name: "May", value: 1890000 },
-  { name: "Jun", value: 2390000 },
-  { name: "Jul", value: 3490000 },
+// ==================== Constants & Data ====================
+const CHART_COLORS = ['#0c8de4', '#34d399', '#f59e0b', '#ef4444'];
+
+const STATS_CONFIG = [
+  {
+    title: 'Total Transactions', value: '$7.4M', change: 12.8,
+    icon: <ChartBar className="h-5 w-5 text-blue-500" />, link: null
+  },
+  {
+    title: 'Pending Settlements', value: '$345.2K', change: -2.3,
+    icon: <Wallet className="h-5 w-5 text-teal-500" />, link: '/settlements'
+  },
+  {
+    title: 'Failed Transactions', value: '$12.7K', change: -18.4,
+    icon: <CreditCard className="h-5 w-5 text-red-500" />, link: '/failures'
+  },
+  {
+    title: 'Compliance Score', value: '97%', change: 3.2,
+    icon: <ShieldCheck className="h-5 w-5 text-green-500" />, link: null
+  }
 ];
 
-interface StatCardProps {
-  title: string;
-  value: string;
-  change: number;
-  icon: React.ReactNode;
-}
+const CHART_DATA = {
+  monthlyVolume: [
+    { name: 'Jan', value: 1200000 }, { name: 'Feb', value: 1900000 },
+    { name: 'Mar', value: 3000000 }, { name: 'Apr', value: 2780000 },
+    { name: 'May', value: 1890000 }, { name: 'Jun', value: 2390000 },
+    { name: 'Jul', value: 3490000 }
+  ],
+  sparkline: [
+    { day: 'Mon', value: 320 }, { day: 'Tue', value: 350 },
+    { day: 'Wed', value: 290 }, { day: 'Thu', value: 400 },
+    { day: 'Fri', value: 380 }, { day: 'Sat', value: 320 },
+    { day: 'Sun', value: 345 }
+  ],
+  sources: [
+    { name: 'Bank Transfer', value: 46 }, { name: 'Mobile Money', value: 25 },
+    { name: 'Card Payment', value: 20 }, { name: 'Cross-Border', value: 9 }
+  ],
+  settlements: [
+    { month: 'Jan', pending: 20000, completed: 180000 },
+    { month: 'Feb', pending: 15000, completed: 210000 },
+    { month: 'Mar', pending: 12000, completed: 240000 },
+    { month: 'Apr', pending: 18000, completed: 200000 },
+    { month: 'May', pending: 17000, completed: 230000 },
+    { month: 'Jun', pending: 14000, completed: 250000 },
+    { month: 'Jul', pending: 11000, completed: 270000 }
+  ]
+};
 
-const sparklineData = [
-  { day: "Mon", value: 320 },
-  { day: "Tue", value: 350 },
-  { day: "Wed", value: 290 },
-  { day: "Thu", value: 400 },
-  { day: "Fri", value: 380 },
-  { day: "Sat", value: 320 },
-  { day: "Sun", value: 345 },
-];
-
-const MiniSparkline = () => (
-  <div className="h-8 w-16">
-    <ResponsiveContainer width="100%" height="100%">
-      <AreaChart data={sparklineData} margin={{ top: 0, right: 0, left: 0, bottom: 0 }}>
-        <Area type="monotone" dataKey="value" stroke="#0c8de4" fill="#e0eefe" />
-      </AreaChart>
-    </ResponsiveContainer>
-  </div>
+// ==================== Reusable Components ====================
+const AnimatedContainer = ({ children, delay = 0 }) => (
+  <motion.div
+    initial={{ opacity: 0, y: 20 }}
+    animate={{ opacity: 1, y: 0 }}
+    transition={{ duration: 0.4, delay }}
+  >
+    {children}
+  </motion.div>
 );
 
-const StatCard = ({ title, value, change, icon }: StatCardProps) => {
+const MiniSparkline = () => (
+  <ResponsiveContainer width="100%" height="100%">
+    <AreaChart data={CHART_DATA.sparkline}>
+      <Area
+        type="monotone"
+        dataKey="value"
+        stroke={CHART_COLORS[0]}
+        fill={CHART_COLORS[0]}
+        fillOpacity={0.2}
+      />
+    </AreaChart>
+  </ResponsiveContainer>
+);
+
+const StatCard = ({ title, value, change, icon, link }) => {
   const navigate = useNavigate();
-  
+  const trendColor = change >= 0 ? 'text-green-600' : 'text-red-600';
+  const TrendArrow = change >= 0 ? '↑' : '↓';
+
   return (
-    <div className="bg-white p-4 rounded-lg shadow-sm">
-      <div className="flex justify-between items-start">
-        <div>
-          <p className="text-sm text-gray-500">{title}</p>
-          <p className="text-2xl font-semibold mt-1">{value}</p>
-          <div className="flex items-center gap-2">
-            <div className={`text-xs mt-2 ${change >= 0 ? 'text-green-600' : 'text-red-600'} flex items-center`}>
-              {change >= 0 ? '↑' : '↓'} {Math.abs(change)}% from previous period
-            </div>
+    <div className="bg-white rounded-2xl shadow-lg p-4 flex flex-col justify-between h-full">
+      <div>
+        <div className="flex justify-between items-start">
+          <div>
+            <h3 className="text-sm font-medium text-gray-600">{title}</h3>
+            <p className="text-2xl font-semibold mt-1 text-gray-900">{value}</p>
+          </div>
+          <div className="p-2 bg-opacity-10 bg-current rounded-lg">{icon}</div>
+        </div>
+        
+        <div className="flex items-center justify-between mt-4">
+          <span className={`text-sm font-medium ${trendColor}`}>
+            {TrendArrow} {Math.abs(change)}% from previous period
+          </span>
+          <div className="w-20 h-10">
             <MiniSparkline />
           </div>
         </div>
-        <div className="p-2 bg-blue-50 text-discrepay-600 rounded-md">
-          {icon}
-        </div>
       </div>
-      {(title === "Pending Settlements" || title === "Failed Transactions") && (
-        <Button 
-          variant="link" 
-          className="mt-2 p-0 h-auto text-sm text-discrepay-600"
-          onClick={() => navigate('/settlements')}
+
+      {link && (
+        <Button
+          variant="ghost"
+          className="mt-4 text-sm w-full flex justify-between items-center text-blue-600 hover:text-blue-700"
+          onClick={() => navigate(link)}
+          aria-label={`View ${title} details`}
         >
-          Investigate <ArrowRight className="h-4 w-4 ml-1" />
+          <span>View Details</span>
+          <ArrowRight className="h-4 w-4 ml-2" />
         </Button>
       )}
     </div>
   );
 };
 
-const FinancialSummary = () => {
-  return (
-    <div className="space-y-6">
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-        <StatCard
-          title="Total Transactions"
-          value="$7.4M"
-          change={12.8}
-          icon={<ChartBar className="h-5 w-5" />}
-        />
-        <StatCard
-          title="Pending Settlements"
-          value="$345.2K"
-          change={-2.3}
-          icon={<Wallet className="h-5 w-5" />}
-        />
-        <StatCard
-          title="Failed Transactions"
-          value="$12.7K"
-          change={-18.4}
-          icon={<CreditCard className="h-5 w-5" />}
-        />
-        <StatCard
-          title="Compliance Score"
-          value="97%"
-          change={3.2}
-          icon={<ShieldCheck className="h-5 w-5" />}
-        />
-      </div>
+// ==================== Chart Components ====================
+const FinancialOverviewChart = () => (
+  <DashboardCard
+    title="Financial Overview"
+    action={
+      <select className="text-xs border rounded-md px-2 py-1 bg-transparent">
+        <option>Last 7 days</option>
+        <option>Last 30 days</option>
+        <option>Last 90 days</option>
+      </select>
+    }
+  >
+    <div className="h-72 md:h-80">
+      <ResponsiveContainer>
+        <AreaChart data={CHART_DATA.monthlyVolume}>
+          <CartesianGrid strokeDasharray="3 3" vertical={false} />
+          <XAxis dataKey="name" tickLine={false} />
+          <YAxis tickFormatter={v => `$${v / 1000}k`} tickLine={false} />
+          <Tooltip formatter={v => [`$${(v / 1000).toFixed(1)}k`, 'Volume']} />
+          <Area
+            type="monotone"
+            dataKey="value"
+            stroke={CHART_COLORS[0]}
+            fillOpacity={0.3}
+            fill={CHART_COLORS[0]}
+          />
+          <Line
+            type="monotone"
+            dataKey="value"
+            stroke="#2563eb"
+            dot={false}
+          />
+        </AreaChart>
+      </ResponsiveContainer>
+    </div>
+  </DashboardCard>
+);
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        <div className="lg:col-span-2">
-          <DashboardCard 
-            title="Financial Overview" 
-            action={
-              <select className="text-xs border rounded-md px-2 py-1">
-                <option>Last 7 days</option>
-                <option>Last 30 days</option>
-                <option>Last 90 days</option>
-              </select>
-            }
+const SourcePieChart = () => (
+  <DashboardCard title="Transaction Sources" icon={<PieIcon className="h-5 w-5 text-purple-500" />}>
+    <div className="h-72 flex items-center justify-center">
+      <ResponsiveContainer>
+        <PieChart>
+          <Pie
+            data={CHART_DATA.sources}
+            dataKey="value"
+            nameKey="name"
+            cx="50%"
+            cy="50%"
+            outerRadius={80}
+            innerRadius={40}
+            paddingAngle={3}
           >
-            <div className="h-80">
-              <ResponsiveContainer width="100%" height="100%">
-                <AreaChart
-                  data={data}
-                  margin={{
-                    top: 10,
-                    right: 10,
-                    left: 0,
-                    bottom: 0,
-                  }}
-                >
-                  <CartesianGrid strokeDasharray="3 3" vertical={false} />
-                  <XAxis dataKey="name" tickLine={false} axisLine={false} />
-                  <YAxis 
-                    tickLine={false} 
-                    axisLine={false} 
-                    tickFormatter={(value) => `$${value / 1000}k`}
-                  />
-                  <Tooltip 
-                    formatter={(value: number) => [`$${(value/1000).toFixed(1)}k`, 'Amount']}
-                  />
-                  <Area
-                    type="monotone"
-                    dataKey="value"
-                    stroke="#0c8de4"
-                    fill="#e0eefe"
-                  />
-                </AreaChart>
-              </ResponsiveContainer>
-            </div>
-          </DashboardCard>
-        </div>
+            {CHART_DATA.sources.map((_, idx) => (
+              <Cell key={`cell-${idx}`} fill={CHART_COLORS[idx % CHART_COLORS.length]} />
+            ))}
+          </Pie>
+          <Tooltip />
+        </PieChart>
+      </ResponsiveContainer>
+    </div>
+  </DashboardCard>
+);
 
-        <DashboardCard title="Settlement Status">
-          <div className="space-y-4">
-            <div>
+const SettlementTrendsChart = () => (
+  <DashboardCard title="Settlement Trends" icon={<Banknote className="h-5 w-5 text-green-500" />}>
+    <div className="h-72">
+      <ResponsiveContainer>
+        <BarChart data={CHART_DATA.settlements}>
+          <CartesianGrid strokeDasharray="3 3" />
+          <XAxis dataKey="month" />
+          <YAxis tickFormatter={v => `$${v / 1000}k`} />
+          <Tooltip formatter={v => `$${v.toLocaleString()}`} />
+          <Bar dataKey="completed" stackId="a" fill={CHART_COLORS[1]} name="Completed" />
+          <Bar dataKey="pending" stackId="a" fill={CHART_COLORS[2]} name="Pending" />
+        </BarChart>
+      </ResponsiveContainer>
+    </div>
+  </DashboardCard>
+);
+
+// ==================== Main Component ====================
+const FinancialSummary = () => (
+  <div className="space-y-6 px-4 md:px-0">
+    {/* Stats Grid */}
+    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+      {STATS_CONFIG.map((item, index) => (
+        <AnimatedContainer key={item.title} delay={index * 0.1}>
+          <StatCard {...item} />
+        </AnimatedContainer>
+      ))}
+    </div>
+
+    {/* Charts Grid */}
+    <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      <AnimatedContainer delay={0.2} className="lg:col-span-2">
+        <FinancialOverviewChart />
+      </AnimatedContainer>
+
+      <AnimatedContainer delay={0.3}>
+        <SourcePieChart />
+      </AnimatedContainer>
+
+      <AnimatedContainer delay={0.4}>
+        <SettlementTrendsChart />
+      </AnimatedContainer>
+    </div>
+
+    {/* Settlement Status */}
+    <AnimatedContainer delay={0.5}>
+      <DashboardCard title="Settlement Status">
+        <div className="space-y-4">
+          {[
+            { label: 'Bank Transfers', value: 92 },
+            { label: 'Mobile Money', value: 78 },
+            { label: 'Card Payments', value: 96 },
+            { label: 'Cross-Border', value: 64 }
+          ].map(({ label, value }) => (
+            <div key={label}>
               <div className="flex justify-between text-sm mb-1">
-                <span>Bank Transfers</span>
-                <span className="font-medium">92%</span>
+                <span>{label}</span>
+                <span className="font-medium">{value}%</span>
               </div>
-              <Progress value={92} className="h-2" />
+              <Progress value={value} className="h-2 bg-gray-100" />
             </div>
-            <div>
-              <div className="flex justify-between text-sm mb-1">
-                <span>Mobile Money</span>
-                <span className="font-medium">78%</span>
+          ))}
+
+          <div className="pt-4 mt-4 border-t">
+            <h4 className="font-medium mb-1">Settlement Summary</h4>
+            <div className="grid grid-cols-2 gap-2 text-sm">
+              <div className="bg-green-50 p-2 rounded">
+                <p className="text-green-700">Successfully Settled</p>
+                <p className="font-semibold mt-1">$6.8M (92%)</p>
               </div>
-              <Progress value={78} className="h-2" />
-            </div>
-            <div>
-              <div className="flex justify-between text-sm mb-1">
-                <span>Card Payments</span>
-                <span className="font-medium">96%</span>
-              </div>
-              <Progress value={96} className="h-2" />
-            </div>
-            <div>
-              <div className="flex justify-between text-sm mb-1">
-                <span>Cross-Border</span>
-                <span className="font-medium">64%</span>
-              </div>
-              <Progress value={64} className="h-2" />
-            </div>
-            <div className="pt-4 border-t mt-4">
-              <h4 className="font-medium mb-1">Settlement Summary</h4>
-              <div className="grid grid-cols-2 gap-2 text-sm">
-                <div className="bg-green-50 p-2 rounded">
-                  <p className="text-green-700">Successfully Settled</p>
-                  <p className="font-semibold mt-1">$6.8M (92%)</p>
-                </div>
-                <div className="bg-amber-50 p-2 rounded">
-                  <p className="text-amber-700">Pending Settlement</p>
-                  <p className="font-semibold mt-1">$345.2K (4.7%)</p>
-                </div>
+              <div className="bg-amber-50 p-2 rounded">
+                <p className="text-amber-700">Pending Settlement</p>
+                <p className="font-semibold mt-1">$345.2K (4.7%)</p>
               </div>
             </div>
           </div>
-        </DashboardCard>
-      </div>
-    </div>
-  );
-};
-
-import { Wallet, CreditCard, ShieldCheck } from "lucide-react";
+        </div>
+      </DashboardCard>
+    </AnimatedContainer>
+  </div>
+);
 
 export default FinancialSummary;
