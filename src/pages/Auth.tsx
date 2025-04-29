@@ -1,131 +1,241 @@
-import { useState } from "react";
-import { useNavigate } from "react-router-dom";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Checkbox } from "@/components/ui/checkbox";
+
+import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { z } from 'zod';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { Button } from '@/components/ui/button';
 import {
   Card,
   CardContent,
+  CardDescription,
   CardFooter,
   CardHeader,
   CardTitle,
-  CardDescription,
-} from "@/components/ui/card";
-import { toast } from "sonner";
+} from '@/components/ui/card';
+import {
+  Tabs,
+  TabsContent,
+  TabsList,
+  TabsTrigger,
+} from '@/components/ui/tabs';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { toast } from 'sonner';
+
+// Form schemas
+const loginSchema = z.object({
+  email: z.string().email('Please enter a valid email address'),
+  password: z.string().min(6, 'Password must be at least 6 characters long'),
+});
+
+const registerSchema = z.object({
+  name: z.string().min(2, 'Name must be at least 2 characters long'),
+  email: z.string().email('Please enter a valid email address'),
+  password: z.string().min(6, 'Password must be at least 6 characters long'),
+  confirmPassword: z.string(),
+}).refine(data => data.password === data.confirmPassword, {
+  message: "Passwords don't match",
+  path: ["confirmPassword"],
+});
+
+type LoginFormValues = z.infer<typeof loginSchema>;
+type RegisterFormValues = z.infer<typeof registerSchema>;
 
 const Auth = () => {
-  const navigate = useNavigate();
+  const [authType, setAuthType] = useState<'login' | 'register'>('login');
   const [isLoading, setIsLoading] = useState(false);
+  const navigate = useNavigate();
 
-  // Login form state
-  const [loginUsername, setLoginUsername] = useState("");
-  const [loginPassword, setLoginPassword] = useState("");
-  const [rememberMe, setRememberMe] = useState(false);
+  // Login form
+  const loginForm = useForm<LoginFormValues>({
+    resolver: zodResolver(loginSchema),
+    defaultValues: {
+      email: '',
+      password: '',
+    },
+  });
 
-  const VALID_CREDENTIALS = { username: "rjlogistics", password: "Abc123**!!" };
+  // Register form
+  const registerForm = useForm<RegisterFormValues>({
+    resolver: zodResolver(registerSchema),
+    defaultValues: {
+      name: '',
+      email: '',
+      password: '',
+      confirmPassword: '',
+    },
+  });
 
-  const handleLogin = (e: React.FormEvent) => {
-    e.preventDefault();
-
-    if (loginUsername !== VALID_CREDENTIALS.username || loginPassword !== VALID_CREDENTIALS.password) {
-      toast.error("Invalid username or password");
-      return;
-    }
-
+  const handleLogin = async (values: LoginFormValues) => {
     setIsLoading(true);
-    // Mock login - replace with actual authentication
-    setTimeout(() => {
+    try {
+      // Mock authentication - In a real app, this would call your API
+      console.log('Login values:', values);
+      
+      // Mock success for demo purposes
+      setTimeout(() => {
+        // Set authentication state in localStorage
+        localStorage.setItem('isAuthenticated', 'true');
+        
+        toast.success('Logged in successfully');
+        navigate('/');
+      }, 1000);
+    } catch (error) {
+      toast.error('Login failed. Please check your credentials.');
+      console.error(error);
+    } finally {
       setIsLoading(false);
-      localStorage.setItem('isAuthenticated', 'true');
-      if (rememberMe) {
-        localStorage.setItem('rememberedUser', loginUsername);
-      }
-      toast.success("Login successful");
-      navigate("/");
-    }, 1000);
+    }
   };
 
-  const handleForgotPassword = () => {
-    const username = loginUsername;
-    if (!username) {
-      toast.error("Please enter your username");
-      return;
+  const handleRegister = async (values: RegisterFormValues) => {
+    setIsLoading(true);
+    try {
+      // Mock registration - In a real app, this would call your API
+      console.log('Register values:', values);
+      
+      // Mock success for demo purposes
+      setTimeout(() => {
+        toast.success('Account created successfully! Please log in.');
+        setAuthType('login');
+        loginForm.setValue('email', values.email);
+      }, 1000);
+    } catch (error) {
+      toast.error('Registration failed. Please try again.');
+      console.error(error);
+    } finally {
+      setIsLoading(false);
     }
-    toast.success("Password reset instructions sent to your email");
   };
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-gray-50 p-4">
-      <div className="w-full max-w-md space-y-4">
-        <div className="text-center">
-          <img
-            src="/lovable-uploads/c6b58a34-ac83-45c0-8be4-4c26b436414d.png"
-            alt="Discrepay Logo"
-            className="mx-auto h-12 w-auto"
-          />
-          <h1 className="text-3xl font-bold">Discrepay</h1>
-          <p className="text-gray-500">Monitor, Control and Settle Your Financial Operations in Real Time</p>
+    <div className="flex min-h-screen flex-col items-center justify-center bg-gray-50 p-4">
+      <div className="w-full max-w-md">
+        <div className="mb-8 text-center">
+          <h1 className="text-3xl font-bold text-insura-600">Insura</h1>
+          <p className="text-gray-600 mt-2">Insurance Management Platform</p>
         </div>
-
-        <Card>
-          <CardHeader>
-            <CardTitle>Welcome Back</CardTitle>
-            <CardDescription>Login to access your dashboard</CardDescription>
-          </CardHeader>
-          <form onSubmit={handleLogin}>
-            <CardContent className="space-y-4">
-              <div className="space-y-2">
-                <Label htmlFor="login-username">Username</Label>
-                <Input
-                  id="login-username"
-                  type="text"
-                  placeholder="Enter your username"
-                  value={loginUsername}
-                  onChange={(e) => setLoginUsername(e.target.value)}
-                  required
-                />
-              </div>
-              <div className="space-y-2">
-                <div className="flex items-center justify-between">
-                  <Label htmlFor="login-password">Password</Label>
-                  <button
-                    type="button"
-                    onClick={handleForgotPassword}
-                    className="text-xs text-discrepay-600 hover:underline"
-                  >
-                    Forgot password?
-                  </button>
-                </div>
-                <Input
-                  id="login-password"
-                  type="password"
-                  value={loginPassword}
-                  onChange={(e) => setLoginPassword(e.target.value)}
-                  required
-                />
-              </div>
-              <div className="flex items-center space-x-2">
-                <Checkbox
-                  id="remember"
-                  checked={rememberMe}
-                  onCheckedChange={(checked) => setRememberMe(checked as boolean)}
-                />
-                <label
-                  htmlFor="remember"
-                  className="text-sm text-gray-500 leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
-                >
-                  Remember me
-                </label>
-              </div>
-            </CardContent>
-            <CardFooter>
-              <Button type="submit" className="w-full" disabled={isLoading}>
-                {isLoading ? "Logging in..." : "Log In"}
-              </Button>
-            </CardFooter>
-          </form>
-        </Card>
+        
+        <Tabs value={authType} onValueChange={(v) => setAuthType(v as 'login' | 'register')}>
+          <TabsList className="grid grid-cols-2 w-full">
+            <TabsTrigger value="login">Login</TabsTrigger>
+            <TabsTrigger value="register">Register</TabsTrigger>
+          </TabsList>
+          
+          <TabsContent value="login">
+            <Card>
+              <CardHeader>
+                <CardTitle>Account Login</CardTitle>
+                <CardDescription>
+                  Enter your credentials to access your account
+                </CardDescription>
+              </CardHeader>
+              <form onSubmit={loginForm.handleSubmit(handleLogin)}>
+                <CardContent className="space-y-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="login-email">Email</Label>
+                    <Input 
+                      id="login-email" 
+                      type="email" 
+                      placeholder="you@example.com"
+                      {...loginForm.register('email')} 
+                    />
+                    {loginForm.formState.errors.email && (
+                      <p className="text-sm text-red-500">{loginForm.formState.errors.email.message}</p>
+                    )}
+                  </div>
+                  <div className="space-y-2">
+                    <div className="flex items-center justify-between">
+                      <Label htmlFor="login-password">Password</Label>
+                      <a href="#" className="text-xs text-insura-600 hover:underline">
+                        Forgot password?
+                      </a>
+                    </div>
+                    <Input 
+                      id="login-password" 
+                      type="password"
+                      {...loginForm.register('password')}
+                    />
+                    {loginForm.formState.errors.password && (
+                      <p className="text-sm text-red-500">{loginForm.formState.errors.password.message}</p>
+                    )}
+                  </div>
+                </CardContent>
+                <CardFooter>
+                  <Button type="submit" className="w-full" disabled={isLoading}>
+                    {isLoading ? 'Logging in...' : 'Log In'}
+                  </Button>
+                </CardFooter>
+              </form>
+            </Card>
+          </TabsContent>
+          
+          <TabsContent value="register">
+            <Card>
+              <CardHeader>
+                <CardTitle>Create Account</CardTitle>
+                <CardDescription>
+                  Enter your details to create a new account
+                </CardDescription>
+              </CardHeader>
+              <form onSubmit={registerForm.handleSubmit(handleRegister)}>
+                <CardContent className="space-y-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="register-name">Full Name</Label>
+                    <Input 
+                      id="register-name"
+                      placeholder="John Doe" 
+                      {...registerForm.register('name')}
+                    />
+                    {registerForm.formState.errors.name && (
+                      <p className="text-sm text-red-500">{registerForm.formState.errors.name.message}</p>
+                    )}
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="register-email">Email</Label>
+                    <Input 
+                      id="register-email" 
+                      type="email"
+                      placeholder="you@example.com"
+                      {...registerForm.register('email')}
+                    />
+                    {registerForm.formState.errors.email && (
+                      <p className="text-sm text-red-500">{registerForm.formState.errors.email.message}</p>
+                    )}
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="register-password">Password</Label>
+                    <Input 
+                      id="register-password" 
+                      type="password"
+                      {...registerForm.register('password')}
+                    />
+                    {registerForm.formState.errors.password && (
+                      <p className="text-sm text-red-500">{registerForm.formState.errors.password.message}</p>
+                    )}
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="register-confirm">Confirm Password</Label>
+                    <Input 
+                      id="register-confirm" 
+                      type="password"
+                      {...registerForm.register('confirmPassword')}
+                    />
+                    {registerForm.formState.errors.confirmPassword && (
+                      <p className="text-sm text-red-500">{registerForm.formState.errors.confirmPassword.message}</p>
+                    )}
+                  </div>
+                </CardContent>
+                <CardFooter>
+                  <Button type="submit" className="w-full" disabled={isLoading}>
+                    {isLoading ? 'Creating account...' : 'Create Account'}
+                  </Button>
+                </CardFooter>
+              </form>
+            </Card>
+          </TabsContent>
+        </Tabs>
       </div>
     </div>
   );

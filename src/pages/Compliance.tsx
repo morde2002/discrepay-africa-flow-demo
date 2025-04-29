@@ -1,58 +1,49 @@
 
-import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
-import SidebarNav from "@/components/layout/Sidebar";
-import { Bell, Search, Settings } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import AppLayout from '@/components/layout/AppLayout';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import DashboardCard from "@/components/ui/DashboardCard";
 import ComplianceDashboard from "@/components/compliance/ComplianceDashboard";
 import RiskAlerts from "@/components/compliance/RiskAlerts";
 import RiskTrendHeatmap from "@/components/compliance/RiskTrendHeatmap";
+import { ShieldCheck, AlertCircle, LineChart } from 'lucide-react';
 
 const Compliance = () => {
   return (
-    <SidebarProvider>
-      <div className="min-h-screen flex w-full">
-        <SidebarNav />
-        <div className="flex-1 overflow-auto">
-          <header className="sticky top-0 z-30 bg-white border-b px-4 sm:px-6 py-3 flex items-center justify-between">
-            <div className="flex items-center">
-              <SidebarTrigger />
-              <div className="ml-4 text-lg font-medium">Compliance & Risk</div>
-            </div>
-            <div className="flex items-center space-x-4">
-              <div className="relative hidden md:block">
-                <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
-                <input
-                  className="pl-8 pr-4 py-2 text-sm border rounded-md w-64 focus:outline-none focus:ring-2 focus:ring-discrepay-300 focus:border-transparent"
-                  placeholder="Search compliance records..."
-                />
-              </div>
-              <Button variant="outline" size="icon">
-                <Bell className="h-4 w-4" />
-              </Button>
-              <Button variant="outline" size="icon">
-                <Settings className="h-4 w-4" />
-              </Button>
-              <Avatar>
-                <AvatarImage src="" />
-                <AvatarFallback className="bg-discrepay-600 text-white">JD</AvatarFallback>
-              </Avatar>
-            </div>
-          </header>
-          
-          <main className="px-4 sm:px-6 py-6 bg-gray-50">
-            <div className="mb-6">
-              <h1 className="text-2xl font-bold mb-2">Compliance & Risk Monitoring</h1>
-              <p className="text-muted-foreground">Monitor AML/KYC compliance, detect fraud patterns, and prepare regulatory reports.</p>
-            </div>
-            
-            <ComplianceDashboard />
-            <RiskTrendHeatmap />
-            <RiskAlerts />
-          </main>
-        </div>
+    <AppLayout>
+      <div className="mb-6">
+        <h1 className="text-2xl font-semibold text-gray-800">Compliance & Risk</h1>
+        <p className="text-gray-600">Monitor and manage regulatory compliance and risk factors</p>
       </div>
-    </SidebarProvider>
+      
+      <Tabs defaultValue="overview" className="space-y-6">
+        <TabsList>
+          <TabsTrigger value="overview" className="flex items-center">
+            <ShieldCheck className="h-4 w-4 mr-2" />
+            Compliance Overview
+          </TabsTrigger>
+          <TabsTrigger value="alerts" className="flex items-center">
+            <AlertCircle className="h-4 w-4 mr-2" />
+            Risk Alerts
+          </TabsTrigger>
+          <TabsTrigger value="trends" className="flex items-center">
+            <LineChart className="h-4 w-4 mr-2" />
+            Risk Trends
+          </TabsTrigger>
+        </TabsList>
+        
+        <TabsContent value="overview" className="space-y-6">
+          <ComplianceDashboard />
+        </TabsContent>
+        
+        <TabsContent value="alerts">
+          <RiskAlerts />
+        </TabsContent>
+        
+        <TabsContent value="trends">
+          <RiskTrendHeatmap />
+        </TabsContent>
+      </Tabs>
+    </AppLayout>
   );
 };
 

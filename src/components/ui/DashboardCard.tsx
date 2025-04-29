@@ -1,38 +1,24 @@
 
-import { ReactNode } from "react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { cn } from "@/lib/utils";
+import React from 'react';
 
 interface DashboardCardProps {
   title: string;
-  children: ReactNode;
+  children: React.ReactNode;
+  action?: React.ReactNode;
   className?: string;
-  action?: ReactNode;
-  footer?: ReactNode;
-  isLoading?: boolean;
 }
 
-const DashboardCard = ({ 
-  title, 
-  children, 
-  className, 
-  action, 
-  footer,
-  isLoading = false 
-}: DashboardCardProps) => {
+const DashboardCard = ({ title, children, action, className = "" }: DashboardCardProps) => {
   return (
-    <Card className={cn("shadow-sm", className)}>
-      <CardHeader className="flex flex-row items-center justify-between pb-2">
-        <CardTitle className="text-sm font-medium">{title}</CardTitle>
-        {action && <div className="flex items-center">{action}</div>}
-      </CardHeader>
-      <CardContent className={isLoading ? "opacity-60 animate-pulse" : ""}>
+    <div className={`bg-white rounded-lg shadow-sm border ${className}`}>
+      <div className="flex justify-between items-center border-b px-6 py-4">
+        <h3 className="font-medium text-gray-800">{title}</h3>
+        {action && <div>{action}</div>}
+      </div>
+      <div className="p-6">
         {children}
-      </CardContent>
-      {footer && (
-        <div className="px-6 py-3 border-t">{footer}</div>
-      )}
-    </Card>
+      </div>
+    </div>
   );
 };
 

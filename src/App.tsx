@@ -7,11 +7,12 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { ProtectedRoute } from "@/components/auth/ProtectedRoute";
 import Index from "./pages/Index";
-import Settlements from "./pages/Settlements";
-import Payouts from "./pages/Payouts";
+import Policies from "./pages/Policies";
+import Claims from "./pages/Claims";
 import Compliance from "./pages/Compliance";
 import Reconciliation from "./pages/Reconciliation";
 import Invoices from "./pages/Invoices";
+import Customers from "./pages/Customers";
 import NotFound from "./pages/NotFound";
 import Auth from "./pages/Auth";
 
@@ -35,14 +36,14 @@ const App: React.FC = () => {
                 <Index />
               </ProtectedRoute>
             } />
-            <Route path="/settlements" element={
+            <Route path="/policies" element={
               <ProtectedRoute>
-                <Settlements />
+                <Policies />
               </ProtectedRoute>
             } />
-            <Route path="/payouts" element={
+            <Route path="/claims" element={
               <ProtectedRoute>
-                <Payouts />
+                <Claims />
               </ProtectedRoute>
             } />
             <Route path="/compliance" element={
@@ -58,6 +59,11 @@ const App: React.FC = () => {
             <Route path="/invoices" element={
               <ProtectedRoute>
                 <Invoices />
+              </ProtectedRoute>
+            } />
+            <Route path="/customers" element={
+              <ProtectedRoute>
+                <Customers />
               </ProtectedRoute>
             } />
             
