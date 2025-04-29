@@ -221,7 +221,7 @@ const Index = () => {
             <TabsTrigger value="compliance">Compliance</TabsTrigger>
           </TabsList>
           <TabsContent value="claims" className="mt-6">
-            <DashboardCard title="Monthly Claims Processing" variant="gradient">
+            <DashboardCard title="Monthly Claims Processing" variant="blue">
               <div className="h-80">
                 <ResponsiveContainer width="100%" height="100%">
                   <BarChart data={claimsData} margin={{ top: 20, right: 30, left: 20, bottom: 5 }}>
@@ -230,7 +230,7 @@ const Index = () => {
                     <YAxis yAxisId="left" orientation="left" stroke="rgba(255,255,255,0.7)" />
                     <YAxis yAxisId="right" orientation="right" stroke="rgba(255,255,255,0.7)" />
                     <RechartsTooltip 
-                      contentStyle={{ backgroundColor: 'rgba(255,255,255,0.9)', borderRadius: '8px' }} 
+                      contentStyle={{ backgroundColor: 'rgba(97, 151, 202, 0.9)', borderRadius: '8px' }} 
                     />
                     <Bar yAxisId="left" dataKey="autoSubmitted" name="Auto - Submitted" fill="#ffffff" />
                     <Bar yAxisId="left" dataKey="autoApproved" name="Auto - Approved" fill="rgba(255,255,255,0.6)" />
@@ -318,7 +318,7 @@ const Index = () => {
           </TabsContent>
           
           <TabsContent value="compliance" className="mt-6">
-            <DashboardCard title="Regulatory Compliance Status">
+            <DashboardCard title="Regulatory Compliance Status" variant="pink">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div className="space-y-4">
                   <h4 className="text-sm font-medium mb-2">Compliance Requirements</h4>
