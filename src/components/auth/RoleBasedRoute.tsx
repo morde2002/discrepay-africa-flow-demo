@@ -1,16 +1,7 @@
 
 import { ReactNode } from 'react';
 import { Navigate } from 'react-router-dom';
-
-// Get the user's role from localStorage
-const getUserRole = (): string | null => {
-  return localStorage.getItem('userRole');
-};
-
-// Check if the user is authenticated
-const isAuthenticated = (): boolean => {
-  return localStorage.getItem('isAuthenticated') === 'true';
-};
+import { useAuth } from './AuthContext';
 
 interface RoleBasedRouteProps {
   children: ReactNode;
@@ -18,6 +9,7 @@ interface RoleBasedRouteProps {
 }
 
 export const RoleBasedRoute = ({ children, allowedRoles = [] }: RoleBasedRouteProps) => {
+  const { isAuthenticated, getUserRole } = useAuth();
   const userRole = getUserRole();
   
   // If user is not authenticated, redirect to login
@@ -35,6 +27,6 @@ export const RoleBasedRoute = ({ children, allowedRoles = [] }: RoleBasedRoutePr
     return <>{children}</>;
   }
   
-  // If user doesn't have permission, redirect to unauthorized page or dashboard
+  // If user doesn't have permission, redirect to unauthorized page
   return <Navigate to="/unauthorized" />;
 };

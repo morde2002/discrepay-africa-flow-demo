@@ -1,5 +1,5 @@
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -16,72 +16,69 @@ import {
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { toast } from "sonner";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { InputOTP, InputOTPGroup, InputOTPSlot } from "@/components/ui/input-otp";
+import { useAuth } from "@/components/auth/AuthContext";
 
 const Auth = () => {
   const navigate = useNavigate();
+  const { login, isAuthenticated, verificationStep, setVerificationStep, updateUserData } = useAuth();
   const [isLoading, setIsLoading] = useState(false);
   const [activeTab, setActiveTab] = useState<"login" | "signup">("login");
-  const [verificationStep, setVerificationStep] = useState(0);
 
   // Login form state
   const [loginUsername, setLoginUsername] = useState("");
   const [loginPassword, setLoginPassword] = useState("");
   const [rememberMe, setRememberMe] = useState(false);
 
-  // Signup form state
+  // Signup form state - Step 1: Account Signup
+  const [country, setCountry] = useState("");
   const [businessName, setBusinessName] = useState("");
-  const [registrationNumber, setRegistrationNumber] = useState("");
-  const [businessEmail, setBusinessEmail] = useState("");
-  const [businessPhone, setBusinessPhone] = useState("");
-  const [signupUsername, setSignupUsername] = useState("");
-  const [signupPassword, setSignupPassword] = useState("");
+  const [firstName, setFirstName] = useState("");
+  const [lastName, setLastName] = useState("");
+  const [email, setEmail] = useState("");
+  const [phone, setPhone] = useState("");
+  const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
-  const [businessType, setBusinessType] = useState("");
   const [termsAccepted, setTermsAccepted] = useState(false);
-
-  // KYC/KYB verification
-  const [verificationCode, setVerificationCode] = useState("");
-  const [documentType, setDocumentType] = useState("");
-  const [documentFile, setDocumentFile] = useState<File | null>(null);
-
-  // Role selection
   const [selectedRole, setSelectedRole] = useState("admin");
 
-  const VALID_CREDENTIALS = { username: "rjlogistics", password: "Abc123**!!" };
-
-  const handleLogin = (e: React.FormEvent) => {
-    e.preventDefault();
-
-    if (loginUsername !== VALID_CREDENTIALS.username || loginPassword !== VALID_CREDENTIALS.password) {
-      toast.error("Invalid username or password");
-      return;
-    }
-
-    setIsLoading(true);
-    // Mock login - replace with actual authentication
-    setTimeout(() => {
-      setIsLoading(false);
-      localStorage.setItem('isAuthenticated', 'true');
-      localStorage.setItem('userRole', 'admin'); // Store role for role-based access
-      if (rememberMe) {
-        localStorage.setItem('rememberedUser', loginUsername);
-      }
-      toast.success("Login successful");
+  useEffect(() => {
+    // If already authenticated, redirect to dashboard
+    if (isAuthenticated()) {
       navigate("/");
-    }, 1000);
+    }
+  }, [isAuthenticated, navigate]);
+
+  const handleLogin = async (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    setIsLoading(true);
+    
+    try {
+      const success = await login(loginUsername, loginPassword, rememberMe);
+      
+      if (success) {
+        toast.success("Login successful");
+        navigate("/");
+      } else {
+        toast.error("Invalid username or password");
+      }
+    } catch (error) {
+      toast.error("An error occurred during login");
+    } finally {
+      setIsLoading(false);
+    }
   };
 
-  const handleSignup = (e: React.FormEvent) => {
+  const handleSignupSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     
     // Form validation
-    if (!businessName || !registrationNumber || !businessEmail || !signupUsername || !signupPassword) {
+    if (!country || !businessName || !firstName || !lastName || !email || !phone || !password) {
       toast.error("Please fill in all required fields");
       return;
     }
 
-    if (signupPassword !== confirmPassword) {
+    if (password !== confirmPassword) {
       toast.error("Passwords do not match");
       return;
     }
@@ -92,48 +89,21 @@ const Auth = () => {
     }
 
     setIsLoading(true);
-    // Proceed to KYC/KYB verification
-    setTimeout(() => {
-      setIsLoading(false);
-      setVerificationStep(1);
-      toast.success("Business details validated. Please complete verification.");
-    }, 1000);
-  };
-
-  const handleVerificationCodeSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
     
-    if (verificationCode.length !== 6) {
-      toast.error("Please enter a valid verification code");
-      return;
-    }
-
-    setIsLoading(true);
+    // Store business info for later verification steps
+    updateUserData({
+      businessName,
+      email,
+      username: `${firstName.toLowerCase()}.${lastName.toLowerCase()}`,
+      role: selectedRole,
+      verificationStatus: "unverified"
+    });
+    
+    // Proceed to email verification step
     setTimeout(() => {
       setIsLoading(false);
-      setVerificationStep(2);
-      toast.success("Email verified. Please upload required documents.");
+      navigate("/verify-email");
     }, 1000);
-  };
-
-  const handleDocumentUpload = (e: React.FormEvent) => {
-    e.preventDefault();
-
-    if (!documentType || !documentFile) {
-      toast.error("Please select a document type and upload a file");
-      return;
-    }
-
-    setIsLoading(true);
-    setTimeout(() => {
-      setIsLoading(false);
-      toast.success("Documents uploaded successfully. Your application is under review.");
-      // In a real app, we would submit the form data to the backend here
-      // For demo purposes, we'll navigate to the dashboard
-      localStorage.setItem('isAuthenticated', 'true');
-      localStorage.setItem('userRole', selectedRole);
-      navigate("/");
-    }, 1500);
   };
 
   const handleForgotPassword = () => {
@@ -143,16 +113,6 @@ const Auth = () => {
       return;
     }
     toast.success("Password reset instructions sent to your email");
-  };
-
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files && e.target.files.length > 0) {
-      setDocumentFile(e.target.files[0]);
-    }
-  };
-
-  const resetVerificationSteps = () => {
-    setVerificationStep(0);
   };
 
   return (
@@ -168,329 +128,218 @@ const Auth = () => {
           <p className="text-gray-500">Monitor, Control and Settle Your Financial Operations in Real Time</p>
         </div>
 
-        {verificationStep === 0 && (
-          <Card className="border-primary/20 shadow-lg">
-            <CardHeader>
-              <Tabs defaultValue="login" value={activeTab} onValueChange={(value) => setActiveTab(value as "login" | "signup")}>
-                <TabsList className="grid w-full grid-cols-2">
-                  <TabsTrigger value="login">Login</TabsTrigger>
-                  <TabsTrigger value="signup">Business Sign Up</TabsTrigger>
-                </TabsList>
-                <TabsContent value="login" className="mt-4">
-                  <CardTitle>Welcome Back</CardTitle>
-                  <CardDescription>Login to access your dashboard</CardDescription>
-                </TabsContent>
-                <TabsContent value="signup" className="mt-4">
-                  <CardTitle>Create Business Account</CardTitle>
-                  <CardDescription>Register your business with Discrepay</CardDescription>
-                </TabsContent>
-              </Tabs>
-            </CardHeader>
-            
-            {activeTab === "login" ? (
-              <form onSubmit={handleLogin}>
-                <CardContent className="space-y-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="login-username">Username</Label>
-                    <Input
-                      id="login-username"
-                      type="text"
-                      placeholder="Enter your username"
-                      value={loginUsername}
-                      onChange={(e) => setLoginUsername(e.target.value)}
-                      required
-                    />
-                  </div>
-                  <div className="space-y-2">
-                    <div className="flex items-center justify-between">
-                      <Label htmlFor="login-password">Password</Label>
-                      <button
-                        type="button"
-                        onClick={handleForgotPassword}
-                        className="text-xs text-primary hover:underline"
-                      >
-                        Forgot password?
-                      </button>
-                    </div>
-                    <Input
-                      id="login-password"
-                      type="password"
-                      value={loginPassword}
-                      onChange={(e) => setLoginPassword(e.target.value)}
-                      required
-                    />
-                  </div>
-                  <div className="flex items-center space-x-2">
-                    <Checkbox
-                      id="remember"
-                      checked={rememberMe}
-                      onCheckedChange={(checked) => setRememberMe(checked as boolean)}
-                    />
-                    <label
-                      htmlFor="remember"
-                      className="text-sm text-gray-500 leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
-                    >
-                      Remember me
-                    </label>
-                  </div>
-                </CardContent>
-                <CardFooter>
-                  <Button type="submit" className="w-full bg-gradient-to-r from-primary to-primary/80" disabled={isLoading}>
-                    {isLoading ? "Logging in..." : "Log In"}
-                  </Button>
-                </CardFooter>
-              </form>
-            ) : (
-              <form onSubmit={handleSignup}>
-                <CardContent className="space-y-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="business-name">Business Name</Label>
-                    <Input
-                      id="business-name"
-                      placeholder="Your business name"
-                      value={businessName}
-                      onChange={(e) => setBusinessName(e.target.value)}
-                      required
-                    />
-                  </div>
-                  
-                  <div className="space-y-2">
-                    <Label htmlFor="registration-number">Registration Number</Label>
-                    <Input
-                      id="registration-number"
-                      placeholder="Business registration number"
-                      value={registrationNumber}
-                      onChange={(e) => setRegistrationNumber(e.target.value)}
-                      required
-                    />
-                  </div>
-
-                  <div className="grid grid-cols-2 gap-3">
-                    <div className="space-y-2">
-                      <Label htmlFor="business-email">Business Email</Label>
-                      <Input
-                        id="business-email"
-                        type="email"
-                        placeholder="email@example.com"
-                        value={businessEmail}
-                        onChange={(e) => setBusinessEmail(e.target.value)}
-                        required
-                      />
-                    </div>
-                    <div className="space-y-2">
-                      <Label htmlFor="business-phone">Business Phone</Label>
-                      <Input
-                        id="business-phone"
-                        placeholder="+254 700 000000"
-                        value={businessPhone}
-                        onChange={(e) => setBusinessPhone(e.target.value)}
-                      />
-                    </div>
-                  </div>
-
-                  <div className="space-y-2">
-                    <Label htmlFor="business-type">Business Type</Label>
-                    <Select value={businessType} onValueChange={setBusinessType}>
-                      <SelectTrigger>
-                        <SelectValue placeholder="Select business type" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="sole-proprietorship">Sole Proprietorship</SelectItem>
-                        <SelectItem value="partnership">Partnership</SelectItem>
-                        <SelectItem value="corporation">Corporation</SelectItem>
-                        <SelectItem value="llc">Limited Liability Company</SelectItem>
-                        <SelectItem value="non-profit">Non-profit</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
-
-                  <div className="space-y-2">
-                    <Label htmlFor="signup-username">Username</Label>
-                    <Input
-                      id="signup-username"
-                      placeholder="Choose a username"
-                      value={signupUsername}
-                      onChange={(e) => setSignupUsername(e.target.value)}
-                      required
-                    />
-                  </div>
-
-                  <div className="grid grid-cols-2 gap-3">
-                    <div className="space-y-2">
-                      <Label htmlFor="signup-password">Password</Label>
-                      <Input
-                        id="signup-password"
-                        type="password"
-                        placeholder="Create password"
-                        value={signupPassword}
-                        onChange={(e) => setSignupPassword(e.target.value)}
-                        required
-                      />
-                    </div>
-                    <div className="space-y-2">
-                      <Label htmlFor="confirm-password">Confirm Password</Label>
-                      <Input
-                        id="confirm-password"
-                        type="password"
-                        placeholder="Confirm password"
-                        value={confirmPassword}
-                        onChange={(e) => setConfirmPassword(e.target.value)}
-                        required
-                      />
-                    </div>
-                  </div>
-
-                  <div className="space-y-2">
-                    <Label htmlFor="role-select">Account Role</Label>
-                    <Select value={selectedRole} onValueChange={setSelectedRole}>
-                      <SelectTrigger>
-                        <SelectValue placeholder="Select your role" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="admin">Administrator</SelectItem>
-                        <SelectItem value="manager">Manager</SelectItem>
-                        <SelectItem value="accountant">Accountant</SelectItem>
-                        <SelectItem value="analyst">Analyst</SelectItem>
-                        <SelectItem value="auditor">Auditor</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
-                  
-                  <div className="flex items-center space-x-2 mt-4">
-                    <Checkbox 
-                      id="terms" 
-                      checked={termsAccepted}
-                      onCheckedChange={(checked) => setTermsAccepted(checked as boolean)}
-                      required
-                    />
-                    <label
-                      htmlFor="terms"
-                      className="text-sm text-gray-500 leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
-                    >
-                      I accept the terms and conditions
-                    </label>
-                  </div>
-                </CardContent>
-                <CardFooter>
-                  <Button type="submit" className="w-full bg-gradient-to-r from-primary to-primary/80" disabled={isLoading}>
-                    {isLoading ? "Processing..." : "Create Account"}
-                  </Button>
-                </CardFooter>
-              </form>
-            )}
-          </Card>
-        )}
-
-        {verificationStep === 1 && (
-          <Card className="border-primary/20 shadow-lg">
-            <CardHeader>
-              <CardTitle>Email Verification</CardTitle>
-              <CardDescription>
-                We've sent a verification code to {businessEmail}. 
-                Please enter the code below to continue.
-              </CardDescription>
-            </CardHeader>
-            <form onSubmit={handleVerificationCodeSubmit}>
-              <CardContent className="space-y-6">
-                <div className="mx-auto max-w-sm">
-                  <InputOTP maxLength={6} value={verificationCode} onChange={setVerificationCode}>
-                    <InputOTPGroup>
-                      <InputOTPSlot index={0} />
-                      <InputOTPSlot index={1} />
-                      <InputOTPSlot index={2} />
-                      <InputOTPSlot index={3} />
-                      <InputOTPSlot index={4} />
-                      <InputOTPSlot index={5} />
-                    </InputOTPGroup>
-                  </InputOTP>
+        <Card className="border-primary/20 shadow-lg">
+          <CardHeader>
+            <Tabs defaultValue="login" value={activeTab} onValueChange={(value) => setActiveTab(value as "login" | "signup")}>
+              <TabsList className="grid w-full grid-cols-2">
+                <TabsTrigger value="login">Login</TabsTrigger>
+                <TabsTrigger value="signup">Business Sign Up</TabsTrigger>
+              </TabsList>
+              <TabsContent value="login" className="mt-4">
+                <CardTitle>Welcome Back</CardTitle>
+                <CardDescription>Login to access your dashboard</CardDescription>
+              </TabsContent>
+              <TabsContent value="signup" className="mt-4">
+                <CardTitle>Create Business Account</CardTitle>
+                <CardDescription>Step 1: Account Information</CardDescription>
+              </TabsContent>
+            </Tabs>
+          </CardHeader>
+          
+          {activeTab === "login" ? (
+            <form onSubmit={handleLogin}>
+              <CardContent className="space-y-4">
+                <div className="space-y-2">
+                  <Label htmlFor="login-username">Username</Label>
+                  <Input
+                    id="login-username"
+                    type="text"
+                    placeholder="Enter your username"
+                    value={loginUsername}
+                    onChange={(e) => setLoginUsername(e.target.value)}
+                    required
+                  />
                 </div>
-                <div className="text-center text-sm">
-                  <p className="text-gray-500">
-                    Didn't receive the code? <button type="button" className="text-primary font-medium hover:underline">Resend</button>
-                  </p>
+                <div className="space-y-2">
+                  <div className="flex items-center justify-between">
+                    <Label htmlFor="login-password">Password</Label>
+                    <button
+                      type="button"
+                      onClick={handleForgotPassword}
+                      className="text-xs text-primary hover:underline"
+                    >
+                      Forgot password?
+                    </button>
+                  </div>
+                  <Input
+                    id="login-password"
+                    type="password"
+                    value={loginPassword}
+                    onChange={(e) => setLoginPassword(e.target.value)}
+                    placeholder="Enter your password"
+                    required
+                  />
+                </div>
+                <div className="flex items-center space-x-2">
+                  <Checkbox
+                    id="remember"
+                    checked={rememberMe}
+                    onCheckedChange={(checked) => setRememberMe(checked as boolean)}
+                  />
+                  <label
+                    htmlFor="remember"
+                    className="text-sm text-gray-500 leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                  >
+                    Remember me
+                  </label>
                 </div>
               </CardContent>
-              <CardFooter className="flex flex-col space-y-2">
+              <CardFooter>
                 <Button type="submit" className="w-full bg-gradient-to-r from-primary to-primary/80" disabled={isLoading}>
-                  {isLoading ? "Verifying..." : "Verify Email"}
-                </Button>
-                <Button variant="ghost" type="button" onClick={resetVerificationSteps} className="w-full">
-                  Back to Sign Up
+                  {isLoading ? "Logging in..." : "Log In"}
                 </Button>
               </CardFooter>
             </form>
-          </Card>
-        )}
-
-        {verificationStep === 2 && (
-          <Card className="border-primary/20 shadow-lg">
-            <CardHeader>
-              <CardTitle>Document Verification</CardTitle>
-              <CardDescription>
-                Please upload the required documents to verify your business identity
-              </CardDescription>
-            </CardHeader>
-            <form onSubmit={handleDocumentUpload}>
+          ) : (
+            <form onSubmit={handleSignupSubmit}>
               <CardContent className="space-y-4">
                 <div className="space-y-2">
-                  <Label htmlFor="document-type">Document Type</Label>
-                  <Select value={documentType} onValueChange={setDocumentType} required>
+                  <Label htmlFor="country">Country</Label>
+                  <Select value={country} onValueChange={setCountry}>
                     <SelectTrigger>
-                      <SelectValue placeholder="Select document type" />
+                      <SelectValue placeholder="Select your country" />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="business-registration">Business Registration Certificate</SelectItem>
-                      <SelectItem value="tax-certificate">Tax Compliance Certificate</SelectItem>
-                      <SelectItem value="business-permit">Business Permit</SelectItem>
-                      <SelectItem value="director-id">Director's ID/Passport</SelectItem>
+                      <SelectItem value="kenya">Kenya</SelectItem>
+                      <SelectItem value="nigeria">Nigeria</SelectItem>
+                      <SelectItem value="uganda">Uganda</SelectItem>
+                      <SelectItem value="tanzania">Tanzania</SelectItem>
+                      <SelectItem value="south-africa">South Africa</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
                 
                 <div className="space-y-2">
-                  <Label htmlFor="document-file">Upload Document</Label>
-                  <div className="flex items-center justify-center w-full">
-                    <label
-                      htmlFor="document-file"
-                      className="flex flex-col items-center justify-center w-full h-32 border-2 border-dashed border-primary/20 rounded-lg cursor-pointer bg-gray-50 hover:bg-gray-100"
-                    >
-                      <div className="flex flex-col items-center justify-center pt-5 pb-6">
-                        <svg className="w-8 h-8 mb-3 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"></path>
-                        </svg>
-                        <p className="mb-2 text-sm text-gray-500">
-                          <span className="font-semibold">Click to upload</span> or drag and drop
-                        </p>
-                        <p className="text-xs text-gray-500">PDF, JPG, PNG (MAX. 10MB)</p>
-                      </div>
-                      <input
-                        id="document-file"
-                        type="file"
-                        className="hidden"
-                        accept=".pdf,.jpg,.jpeg,.png"
-                        onChange={handleFileChange}
-                        required
-                      />
-                    </label>
+                  <Label htmlFor="business-name">Business Name</Label>
+                  <Input
+                    id="business-name"
+                    placeholder="Your business name"
+                    value={businessName}
+                    onChange={(e) => setBusinessName(e.target.value)}
+                    required
+                  />
+                </div>
+                
+                <div className="grid grid-cols-2 gap-3">
+                  <div className="space-y-2">
+                    <Label htmlFor="first-name">First Name</Label>
+                    <Input
+                      id="first-name"
+                      placeholder="First name"
+                      value={firstName}
+                      onChange={(e) => setFirstName(e.target.value)}
+                      required
+                    />
                   </div>
-                  {documentFile && (
-                    <p className="text-sm text-green-600 mt-2">
-                      File selected: {documentFile.name}
-                    </p>
-                  )}
+                  <div className="space-y-2">
+                    <Label htmlFor="last-name">Last Name</Label>
+                    <Input
+                      id="last-name"
+                      placeholder="Last name"
+                      value={lastName}
+                      onChange={(e) => setLastName(e.target.value)}
+                      required
+                    />
+                  </div>
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="email">Email</Label>
+                  <Input
+                    id="email"
+                    type="email"
+                    placeholder="your-email@example.com"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    required
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="phone">Phone Number</Label>
+                  <Input
+                    id="phone"
+                    placeholder="+254 700 000000"
+                    value={phone}
+                    onChange={(e) => setPhone(e.target.value)}
+                    required
+                  />
+                </div>
+
+                <div className="grid grid-cols-2 gap-3">
+                  <div className="space-y-2">
+                    <Label htmlFor="password">Password</Label>
+                    <Input
+                      id="password"
+                      type="password"
+                      placeholder="Create password"
+                      value={password}
+                      onChange={(e) => setPassword(e.target.value)}
+                      required
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="confirm-password">Confirm Password</Label>
+                    <Input
+                      id="confirm-password"
+                      type="password"
+                      placeholder="Confirm password"
+                      value={confirmPassword}
+                      onChange={(e) => setConfirmPassword(e.target.value)}
+                      required
+                    />
+                  </div>
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="role-select">Account Role</Label>
+                  <Select value={selectedRole} onValueChange={setSelectedRole}>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select your role" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="admin">Administrator</SelectItem>
+                      <SelectItem value="manager">Manager</SelectItem>
+                      <SelectItem value="accountant">Accountant</SelectItem>
+                      <SelectItem value="analyst">Analyst</SelectItem>
+                      <SelectItem value="auditor">Auditor</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+                
+                <div className="flex items-center space-x-2 mt-4">
+                  <Checkbox 
+                    id="terms" 
+                    checked={termsAccepted}
+                    onCheckedChange={(checked) => setTermsAccepted(checked as boolean)}
+                    required
+                  />
+                  <label
+                    htmlFor="terms"
+                    className="text-sm text-gray-500 leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                  >
+                    I accept the terms and conditions
+                  </label>
                 </div>
               </CardContent>
-              <CardFooter className="flex flex-col space-y-2">
+              <CardFooter>
                 <Button type="submit" className="w-full bg-gradient-to-r from-primary to-primary/80" disabled={isLoading}>
-                  {isLoading ? "Uploading..." : "Submit Documents"}
-                </Button>
-                <Button variant="ghost" type="button" onClick={resetVerificationSteps} className="w-full">
-                  Back to Sign Up
+                  {isLoading ? "Submitting..." : "Next: Email Verification"}
                 </Button>
               </CardFooter>
             </form>
-          </Card>
-        )}
+          )}
+        </Card>
       </div>
     </div>
   );
