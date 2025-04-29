@@ -13,6 +13,8 @@ import Compliance from "./pages/Compliance";
 import Reconciliation from "./pages/Reconciliation";
 import Invoices from "./pages/Invoices";
 import Customers from "./pages/Customers";
+import Settings from "./pages/Settings";
+import Profile from "./pages/Profile";
 import NotFound from "./pages/NotFound";
 import Auth from "./pages/Auth";
 
@@ -64,6 +66,16 @@ const App: React.FC = () => {
             <Route path="/customers" element={
               <ProtectedRoute>
                 <Customers />
+              </ProtectedRoute>
+            } />
+            <Route path="/settings" element={
+              <ProtectedRoute>
+                <Settings />
+              </ProtectedRoute>
+            } />
+            <Route path="/profile" element={
+              <ProtectedRoute>
+                <Profile />
               </ProtectedRoute>
             } />
             
