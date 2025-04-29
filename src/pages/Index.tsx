@@ -20,6 +20,7 @@ import {
   BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip as RechartsTooltip, 
   ResponsiveContainer, PieChart, Pie, Cell, LineChart, Line
 } from 'recharts';
+import { toast } from 'sonner';
 
 // Dashboard data
 const policyTypeData = [
@@ -62,16 +63,15 @@ const STATUS_COLORS = {
 };
 
 const Index = () => {
+  const handleExportData = () => {
+    toast.success("Exporting data...");
+  };
+
   return (
     <AppLayout>
-      <div className="mb-6">
-        <h1 className="text-2xl font-semibold text-gray-800">Insurance Dashboard</h1>
-        <p className="text-gray-600">Welcome back to your insurance management platform</p>
-      </div>
-      
       {/* Key Metrics */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
-        <Card>
+        <Card className="hover:shadow-md transition-shadow">
           <CardHeader className="flex flex-row items-center justify-between pb-2">
             <CardTitle className="text-sm font-medium">Total Policies</CardTitle>
             <FileText className="h-4 w-4 text-muted-foreground" />
@@ -88,7 +88,7 @@ const Index = () => {
           </CardContent>
         </Card>
         
-        <Card>
+        <Card className="hover:shadow-md transition-shadow">
           <CardHeader className="flex flex-row items-center justify-between pb-2">
             <CardTitle className="text-sm font-medium">Active Claims</CardTitle>
             <AlertTriangle className="h-4 w-4 text-muted-foreground" />
@@ -105,7 +105,7 @@ const Index = () => {
           </CardContent>
         </Card>
         
-        <Card>
+        <Card className="hover:shadow-md transition-shadow">
           <CardHeader className="flex flex-row items-center justify-between pb-2">
             <CardTitle className="text-sm font-medium">Customer Base</CardTitle>
             <User className="h-4 w-4 text-muted-foreground" />
@@ -122,7 +122,7 @@ const Index = () => {
           </CardContent>
         </Card>
         
-        <Card>
+        <Card className="hover:shadow-md transition-shadow">
           <CardHeader className="flex flex-row items-center justify-between pb-2">
             <CardTitle className="text-sm font-medium">Premium Revenue</CardTitle>
             <DollarSign className="h-4 w-4 text-muted-foreground" />
@@ -146,8 +146,9 @@ const Index = () => {
         <div className="lg:col-span-2">
           <DashboardCard 
             title="Premium Revenue Trend"
+            variant="blue"
             action={
-              <Button variant="outline" size="sm">
+              <Button variant="secondary" size="sm" onClick={handleExportData}>
                 <Download className="h-4 w-4 mr-1" />
                 Export
               </Button>
@@ -156,21 +157,23 @@ const Index = () => {
             <div className="h-80">
               <ResponsiveContainer width="100%" height="100%">
                 <LineChart data={premiumData} margin={{ top: 5, right: 30, left: 20, bottom: 5 }}>
-                  <CartesianGrid strokeDasharray="3 3" vertical={false} />
-                  <XAxis dataKey="month" />
+                  <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="rgba(255,255,255,0.2)" />
+                  <XAxis dataKey="month" stroke="rgba(255,255,255,0.7)" />
                   <YAxis 
                     tickFormatter={(value) => `$${(value / 1000).toFixed(0)}K`} 
+                    stroke="rgba(255,255,255,0.7)"
                   />
                   <RechartsTooltip 
                     formatter={(value: any) => [`$${Number(value).toLocaleString()}`, 'Premium']}
+                    contentStyle={{ backgroundColor: 'rgba(255,255,255,0.9)', borderRadius: '8px' }}
                   />
                   <Line 
                     type="monotone" 
                     dataKey="premium" 
-                    stroke="#06acf1" 
+                    stroke="#ffffff" 
                     strokeWidth={3}
-                    dot={{ stroke: '#06acf1', strokeWidth: 2, r: 4, fill: 'white' }}
-                    activeDot={{ r: 6 }}
+                    dot={{ stroke: '#ffffff', strokeWidth: 2, r: 4, fill: 'rgba(255,255,255,0.5)' }}
+                    activeDot={{ r: 6, fill: '#ffffff' }}
                   />
                 </LineChart>
               </ResponsiveContainer>
@@ -179,7 +182,7 @@ const Index = () => {
         </div>
         
         {/* Policy Distribution */}
-        <DashboardCard title="Policy Distribution">
+        <DashboardCard title="Policy Distribution" variant="purple">
           <div className="h-80">
             <ResponsiveContainer width="100%" height="100%">
               <PieChart>
@@ -199,7 +202,10 @@ const Index = () => {
                     <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
                   ))}
                 </Pie>
-                <RechartsTooltip formatter={(value) => `${value}%`} />
+                <RechartsTooltip 
+                  formatter={(value) => `${value}%`}
+                  contentStyle={{ backgroundColor: 'rgba(255,255,255,0.9)', borderRadius: '8px' }} 
+                />
               </PieChart>
             </ResponsiveContainer>
           </div>
@@ -208,26 +214,28 @@ const Index = () => {
       
       {/* Policy and Claims Section */}
       <div className="mt-6">
-        <Tabs defaultValue="claims">
+        <Tabs defaultValue="claims" className="mt-2">
           <TabsList>
             <TabsTrigger value="claims">Claims Analysis</TabsTrigger>
             <TabsTrigger value="reconciliation">Reconciliation Status</TabsTrigger>
             <TabsTrigger value="compliance">Compliance</TabsTrigger>
           </TabsList>
           <TabsContent value="claims" className="mt-6">
-            <DashboardCard title="Monthly Claims Processing">
+            <DashboardCard title="Monthly Claims Processing" variant="gradient">
               <div className="h-80">
                 <ResponsiveContainer width="100%" height="100%">
                   <BarChart data={claimsData} margin={{ top: 20, right: 30, left: 20, bottom: 5 }}>
-                    <CartesianGrid strokeDasharray="3 3" />
-                    <XAxis dataKey="month" />
-                    <YAxis yAxisId="left" orientation="left" stroke="#06acf1" />
-                    <YAxis yAxisId="right" orientation="right" stroke="#21a3a4" />
-                    <RechartsTooltip />
-                    <Bar yAxisId="left" dataKey="autoSubmitted" name="Auto - Submitted" fill="#06acf1" />
-                    <Bar yAxisId="left" dataKey="autoApproved" name="Auto - Approved" fill="#90caf9" />
-                    <Bar yAxisId="right" dataKey="healthSubmitted" name="Health - Submitted" fill="#21a3a4" />
-                    <Bar yAxisId="right" dataKey="healthApproved" name="Health - Approved" fill="#80cbc4" />
+                    <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.2)" />
+                    <XAxis dataKey="month" stroke="rgba(255,255,255,0.7)" />
+                    <YAxis yAxisId="left" orientation="left" stroke="rgba(255,255,255,0.7)" />
+                    <YAxis yAxisId="right" orientation="right" stroke="rgba(255,255,255,0.7)" />
+                    <RechartsTooltip 
+                      contentStyle={{ backgroundColor: 'rgba(255,255,255,0.9)', borderRadius: '8px' }} 
+                    />
+                    <Bar yAxisId="left" dataKey="autoSubmitted" name="Auto - Submitted" fill="#ffffff" />
+                    <Bar yAxisId="left" dataKey="autoApproved" name="Auto - Approved" fill="rgba(255,255,255,0.6)" />
+                    <Bar yAxisId="right" dataKey="healthSubmitted" name="Health - Submitted" fill="rgba(255,255,255,0.4)" />
+                    <Bar yAxisId="right" dataKey="healthApproved" name="Health - Approved" fill="rgba(255,255,255,0.2)" />
                   </BarChart>
                 </ResponsiveContainer>
               </div>
@@ -236,7 +244,7 @@ const Index = () => {
           
           <TabsContent value="reconciliation" className="mt-6">
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              <DashboardCard title="Reconciliation Summary">
+              <DashboardCard title="Reconciliation Summary" variant="pink">
                 <div className="h-64">
                   <ResponsiveContainer width="100%" height="100%">
                     <PieChart>
@@ -252,53 +260,56 @@ const Index = () => {
                         label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
                         labelLine={false}
                       >
-                        <Cell key="cell-0" fill={STATUS_COLORS.matched} />
-                        <Cell key="cell-1" fill={STATUS_COLORS.inProgress} />
-                        <Cell key="cell-2" fill={STATUS_COLORS.discrepancy} />
+                        <Cell key="cell-0" fill="#ffffff" />
+                        <Cell key="cell-1" fill="rgba(255,255,255,0.7)" />
+                        <Cell key="cell-2" fill="rgba(255,255,255,0.4)" />
                       </Pie>
-                      <RechartsTooltip formatter={(value) => `${value}%`} />
+                      <RechartsTooltip 
+                        formatter={(value) => `${value}%`}
+                        contentStyle={{ backgroundColor: 'rgba(255,255,255,0.9)', borderRadius: '8px' }} 
+                      />
                     </PieChart>
                   </ResponsiveContainer>
                 </div>
               </DashboardCard>
               
               <div className="md:col-span-2">
-                <DashboardCard title="Reconciliation Status by Department">
+                <DashboardCard title="Reconciliation Status by Department" variant="orange">
                   <div className="space-y-5">
                     <div>
                       <div className="flex justify-between mb-1 text-sm">
                         <span>Auto Insurance</span>
                         <span className="font-medium">92%</span>
                       </div>
-                      <Progress value={92} className="h-2" />
+                      <Progress value={92} className="h-2 [&>div]:bg-white" />
                     </div>
                     <div>
                       <div className="flex justify-between mb-1 text-sm">
                         <span>Health Insurance</span>
                         <span className="font-medium">87%</span>
                       </div>
-                      <Progress value={87} className="h-2" />
+                      <Progress value={87} className="h-2 [&>div]:bg-white" />
                     </div>
                     <div>
                       <div className="flex justify-between mb-1 text-sm">
                         <span>Property Insurance</span>
                         <span className="font-medium">76%</span>
                       </div>
-                      <Progress value={76} className="h-2" />
+                      <Progress value={76} className="h-2 [&>div]:bg-white" />
                     </div>
                     <div>
                       <div className="flex justify-between mb-1 text-sm">
                         <span>Life Insurance</span>
                         <span className="font-medium">94%</span>
                       </div>
-                      <Progress value={94} className="h-2" />
+                      <Progress value={94} className="h-2 [&>div]:bg-white" />
                     </div>
                     <div>
                       <div className="flex justify-between mb-1 text-sm">
                         <span>Business Insurance</span>
                         <span className="font-medium">81%</span>
                       </div>
-                      <Progress value={81} className="h-2" />
+                      <Progress value={81} className="h-2 [&>div]:bg-white" />
                     </div>
                   </div>
                 </DashboardCard>
@@ -310,37 +321,35 @@ const Index = () => {
             <DashboardCard title="Regulatory Compliance Status">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div className="space-y-4">
-                  <div>
-                    <h4 className="text-sm font-medium mb-2">Compliance Requirements</h4>
-                    <div className="space-y-3">
-                      <div>
-                        <div className="flex justify-between text-xs mb-1">
-                          <span>KYC Verification</span>
-                          <span>98%</span>
-                        </div>
-                        <Progress value={98} className="h-1" />
+                  <h4 className="text-sm font-medium mb-2">Compliance Requirements</h4>
+                  <div className="space-y-3">
+                    <div>
+                      <div className="flex justify-between text-xs mb-1">
+                        <span>KYC Verification</span>
+                        <span>98%</span>
                       </div>
-                      <div>
-                        <div className="flex justify-between text-xs mb-1">
-                          <span>AML Screening</span>
-                          <span>100%</span>
-                        </div>
-                        <Progress value={100} className="h-1" />
+                      <Progress value={98} className="h-1" />
+                    </div>
+                    <div>
+                      <div className="flex justify-between text-xs mb-1">
+                        <span>AML Screening</span>
+                        <span>100%</span>
                       </div>
-                      <div>
-                        <div className="flex justify-between text-xs mb-1">
-                          <span>Fraud Detection</span>
-                          <span>94%</span>
-                        </div>
-                        <Progress value={94} className="h-1" />
+                      <Progress value={100} className="h-1" />
+                    </div>
+                    <div>
+                      <div className="flex justify-between text-xs mb-1">
+                        <span>Fraud Detection</span>
+                        <span>94%</span>
                       </div>
-                      <div>
-                        <div className="flex justify-between text-xs mb-1">
-                          <span>Regulatory Reporting</span>
-                          <span>100%</span>
-                        </div>
-                        <Progress value={100} className="h-1" />
+                      <Progress value={94} className="h-1" />
+                    </div>
+                    <div>
+                      <div className="flex justify-between text-xs mb-1">
+                        <span>Regulatory Reporting</span>
+                        <span>100%</span>
                       </div>
+                      <Progress value={100} className="h-1" />
                     </div>
                   </div>
                 </div>
@@ -348,26 +357,26 @@ const Index = () => {
                 <div>
                   <h4 className="text-sm font-medium mb-2">Latest Compliance Updates</h4>
                   <div className="space-y-3">
-                    <div className="bg-green-50 p-3 rounded-md">
-                      <div className="flex items-center text-green-800">
+                    <div className="bg-green-50 dark:bg-green-900/20 p-3 rounded-md">
+                      <div className="flex items-center text-green-800 dark:text-green-300">
                         <CheckCircle className="h-4 w-4 mr-2" />
                         <span className="font-medium">Quarterly NAICOM Report</span>
                       </div>
-                      <p className="text-xs text-gray-600 mt-1 ml-6">Submitted on April 15, 2025</p>
+                      <p className="text-xs text-gray-600 dark:text-gray-400 mt-1 ml-6">Submitted on April 15, 2025</p>
                     </div>
-                    <div className="bg-green-50 p-3 rounded-md">
-                      <div className="flex items-center text-green-800">
+                    <div className="bg-green-50 dark:bg-green-900/20 p-3 rounded-md">
+                      <div className="flex items-center text-green-800 dark:text-green-300">
                         <CheckCircle className="h-4 w-4 mr-2" />
                         <span className="font-medium">Annual Compliance Audit</span>
                       </div>
-                      <p className="text-xs text-gray-600 mt-1 ml-6">Completed on March 30, 2025</p>
+                      <p className="text-xs text-gray-600 dark:text-gray-400 mt-1 ml-6">Completed on March 30, 2025</p>
                     </div>
-                    <div className="bg-amber-50 p-3 rounded-md">
-                      <div className="flex items-center text-amber-800">
+                    <div className="bg-amber-50 dark:bg-amber-900/20 p-3 rounded-md">
+                      <div className="flex items-center text-amber-800 dark:text-amber-300">
                         <AlertTriangle className="h-4 w-4 mr-2" />
                         <span className="font-medium">Data Protection Review</span>
                       </div>
-                      <p className="text-xs text-gray-600 mt-1 ml-6">Due on May 25, 2025</p>
+                      <p className="text-xs text-gray-600 dark:text-gray-400 mt-1 ml-6">Due on May 25, 2025</p>
                     </div>
                   </div>
                 </div>
