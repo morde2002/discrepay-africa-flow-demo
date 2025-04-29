@@ -16,7 +16,8 @@ import {
   User,
   Search,
   Moon,
-  Sun
+  Sun,
+  Download
 } from 'lucide-react';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
@@ -61,12 +62,30 @@ export default function AppLayout({ children }: AppLayoutProps) {
 
   // Handle dark mode toggle
   useEffect(() => {
-    if (isDarkMode) {
+    // Check if user previously set a preference
+    const savedTheme = localStorage.getItem('theme');
+    const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+    
+    if (savedTheme === 'dark' || (!savedTheme && prefersDark)) {
       document.documentElement.classList.add('dark');
+      setIsDarkMode(true);
     } else {
       document.documentElement.classList.remove('dark');
+      setIsDarkMode(false);
     }
-  }, [isDarkMode]);
+  }, []);
+
+  const toggleDarkMode = () => {
+    if (isDarkMode) {
+      document.documentElement.classList.remove('dark');
+      localStorage.setItem('theme', 'light');
+      setIsDarkMode(false);
+    } else {
+      document.documentElement.classList.add('dark');
+      localStorage.setItem('theme', 'dark');
+      setIsDarkMode(true);
+    }
+  };
 
   const toggleSidebar = () => {
     setSidebarOpen(!sidebarOpen);
@@ -86,6 +105,15 @@ export default function AppLayout({ children }: AppLayoutProps) {
     toast.success('Logged out successfully');
     navigate('/auth');
   };
+
+  const getGreeting = () => {
+    const hour = new Date().getHours();
+    if (hour < 12) return 'Good morning';
+    if (hour < 18) return 'Good afternoon';
+    return 'Good evening';
+  };
+
+  const userName = 'RJ Logistics';
 
   return (
     <div className="flex h-screen bg-gray-50 dark:bg-gray-900">
@@ -107,7 +135,14 @@ export default function AppLayout({ children }: AppLayoutProps) {
             </button>
           </div>
           <div className="flex flex-shrink-0 items-center px-4">
-            <h1 className="text-2xl font-bold text-insura-600">Discrepay</h1>
+            <div className="flex items-center">
+              <img 
+                src="/lovable-uploads/e0bfcd64-6451-439d-a4d8-31ba4fc3c5d7.png" 
+                alt="Discrepay Logo" 
+                className="h-9 w-9"
+              />
+              <h1 className="ml-2 text-2xl font-bold text-discrepay-600">Discrepay</h1>
+            </div>
           </div>
           <div className="mt-8 flex flex-1 flex-col">
             <nav className="flex-1 space-y-1 px-2">
@@ -119,19 +154,19 @@ export default function AppLayout({ children }: AppLayoutProps) {
                     to={item.path}
                     className={`group flex items-center rounded-md px-2 py-2 text-base font-medium ${
                       isActive
-                        ? 'bg-insura-50 text-insura-600 dark:bg-gray-700 dark:text-white'
+                        ? 'bg-discrepay-50 text-discrepay-600 dark:bg-gray-700 dark:text-white'
                         : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900 dark:text-gray-300 dark:hover:bg-gray-700 dark:hover:text-white'
                     }`}
                   >
                     <item.icon
                       className={`mr-4 h-6 w-6 flex-shrink-0 ${
-                        isActive ? 'text-insura-600 dark:text-white' : 'text-gray-400 group-hover:text-gray-500 dark:text-gray-400'
+                        isActive ? 'text-discrepay-600 dark:text-white' : 'text-gray-400 group-hover:text-gray-500 dark:text-gray-400'
                       }`}
                       aria-hidden="true"
                     />
                     {item.name}
                     {item.notification && (
-                      <Badge className="ml-auto bg-insura-500">{item.notification}</Badge>
+                      <Badge className="ml-auto bg-discrepay-500">{item.notification}</Badge>
                     )}
                   </Link>
                 );
@@ -144,7 +179,14 @@ export default function AppLayout({ children }: AppLayoutProps) {
       {/* Static sidebar for desktop */}
       <div className="hidden lg:fixed lg:inset-y-0 lg:flex lg:w-64 lg:flex-col lg:border-r lg:border-gray-200 lg:bg-white lg:pt-5 lg:pb-4 dark:lg:border-gray-700 dark:lg:bg-gray-800">
         <div className="flex flex-shrink-0 items-center px-6">
-          <h1 className="text-2xl font-bold text-insura-600 dark:text-white">Discrepay</h1>
+          <div className="flex items-center">
+            <img 
+              src="/lovable-uploads/e0bfcd64-6451-439d-a4d8-31ba4fc3c5d7.png" 
+              alt="Discrepay Logo" 
+              className="h-10 w-10"
+            />
+            <h1 className="ml-2 text-2xl font-bold text-discrepay-600 dark:text-white">Discrepay</h1>
+          </div>
         </div>
         <div className="mt-8 flex h-0 flex-1 flex-col overflow-y-auto">
           <nav className="flex-1 space-y-1 px-3">
@@ -154,28 +196,28 @@ export default function AppLayout({ children }: AppLayoutProps) {
                 <Link
                   key={item.name}
                   to={item.path}
-                  className={`group flex items-center rounded-md px-3 py-2 text-sm font-medium ${
+                  className={`group flex items-center rounded-md px-3 py-2 text-sm font-medium transition-colors ${
                     isActive
-                      ? 'bg-insura-50 text-insura-600 dark:bg-gray-700 dark:text-white'
+                      ? 'bg-discrepay-50 text-discrepay-600 dark:bg-gray-700 dark:text-white'
                       : 'text-gray-700 hover:bg-gray-50 hover:text-gray-900 dark:text-gray-300 dark:hover:bg-gray-700 dark:hover:text-white'
                   }`}
                 >
                   <item.icon
-                    className={`mr-3 h-5 w-5 flex-shrink-0 ${
-                      isActive ? 'text-insura-600 dark:text-white' : 'text-gray-400 group-hover:text-gray-500 dark:text-gray-400'
+                    className={`mr-3 h-5 w-5 flex-shrink-0 transition-colors ${
+                      isActive ? 'text-discrepay-600 dark:text-white' : 'text-gray-400 group-hover:text-gray-500 dark:text-gray-400'
                     }`}
                     aria-hidden="true"
                   />
                   {item.name}
                   {item.notification && (
-                    <Badge className="ml-auto bg-insura-500">{item.notification}</Badge>
+                    <Badge className="ml-auto bg-discrepay-500">{item.notification}</Badge>
                   )}
                 </Link>
               );
             })}
           </nav>
           <div className="mt-6 px-3">
-            <Button variant="outline" className="w-full justify-start" asChild>
+            <Button variant="outline" className="w-full justify-start hover:bg-gray-100 dark:hover:bg-gray-700" asChild>
               <Link to="/settings">
                 <Settings className="mr-3 h-5 w-5" />
                 Settings
@@ -187,10 +229,10 @@ export default function AppLayout({ children }: AppLayoutProps) {
 
       {/* Main content */}
       <div className="flex flex-1 flex-col lg:pl-64">
-        <div className="sticky top-0 z-10 flex h-16 flex-shrink-0 border-b border-gray-200 bg-white dark:border-gray-700 dark:bg-gray-800">
+        <div className="sticky top-0 z-10 flex h-16 flex-shrink-0 border-b border-gray-200 bg-white dark:border-gray-700 dark:bg-gray-800 shadow-sm">
           <button
             type="button"
-            className="border-r border-gray-200 px-4 text-gray-500 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-insura-500 dark:border-gray-700 dark:text-gray-400 lg:hidden"
+            className="border-r border-gray-200 px-4 text-gray-500 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-discrepay-500 dark:border-gray-700 dark:text-gray-400 lg:hidden"
             onClick={toggleSidebar}
           >
             <span className="sr-only">Open sidebar</span>
@@ -206,7 +248,7 @@ export default function AppLayout({ children }: AppLayoutProps) {
                   <Input 
                     type="search" 
                     placeholder="Search..." 
-                    className="pl-10 w-full lg:max-w-xs"
+                    className="pl-10 w-full lg:max-w-xs bg-gray-50 dark:bg-gray-700 focus:bg-white dark:focus:bg-gray-800"
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
                   />
@@ -217,17 +259,28 @@ export default function AppLayout({ children }: AppLayoutProps) {
               <Button 
                 variant="ghost" 
                 size="icon" 
-                onClick={() => setIsDarkMode(!isDarkMode)}
-                className="relative"
+                onClick={toggleDarkMode}
+                className="relative hover:bg-gray-100 dark:hover:bg-gray-700"
+                title={isDarkMode ? "Switch to light mode" : "Switch to dark mode"}
               >
                 {isDarkMode ? <Sun className="h-5 w-5" /> : <Moon className="h-5 w-5" />}
+              </Button>
+
+              <Button 
+                variant="ghost" 
+                size="icon" 
+                onClick={() => toast.info("Downloaded report")}
+                className="relative hover:bg-gray-100 dark:hover:bg-gray-700"
+                title="Download reports"
+              >
+                <Download className="h-5 w-5" />
               </Button>
               
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                  <Button variant="ghost" size="icon" className="relative">
+                  <Button variant="ghost" size="icon" className="relative hover:bg-gray-100 dark:hover:bg-gray-700">
                     <Bell className="h-5 w-5" />
-                    <span className="absolute -top-1 -right-1 h-4 w-4 rounded-full bg-insura-500 text-[10px] text-white flex items-center justify-center">
+                    <span className="absolute -top-1 -right-1 h-4 w-4 rounded-full bg-discrepay-500 text-[10px] text-white flex items-center justify-center">
                       3
                     </span>
                   </Button>
@@ -236,32 +289,32 @@ export default function AppLayout({ children }: AppLayoutProps) {
                   <DropdownMenuLabel>Notifications</DropdownMenuLabel>
                   <DropdownMenuSeparator />
                   <div className="max-h-80 overflow-y-auto">
-                    <DropdownMenuItem className="cursor-pointer p-3">
+                    <DropdownMenuItem className="cursor-pointer p-3 hover:bg-gray-100 dark:hover:bg-gray-700">
                       <div>
                         <p className="font-medium">New claim submitted</p>
-                        <p className="text-sm text-gray-500">Claim #12345 has been submitted for review</p>
-                        <p className="text-xs text-gray-400">2 minutes ago</p>
+                        <p className="text-sm text-gray-500 dark:text-gray-400">Claim #12345 has been submitted for review</p>
+                        <p className="text-xs text-gray-400 dark:text-gray-500">2 minutes ago</p>
                       </div>
                     </DropdownMenuItem>
-                    <DropdownMenuItem className="cursor-pointer p-3">
+                    <DropdownMenuItem className="cursor-pointer p-3 hover:bg-gray-100 dark:hover:bg-gray-700">
                       <div>
                         <p className="font-medium">Policy renewal reminder</p>
-                        <p className="text-sm text-gray-500">5 policies are up for renewal next week</p>
-                        <p className="text-xs text-gray-400">1 hour ago</p>
+                        <p className="text-sm text-gray-500 dark:text-gray-400">5 policies are up for renewal next week</p>
+                        <p className="text-xs text-gray-400 dark:text-gray-500">1 hour ago</p>
                       </div>
                     </DropdownMenuItem>
-                    <DropdownMenuItem className="cursor-pointer p-3">
+                    <DropdownMenuItem className="cursor-pointer p-3 hover:bg-gray-100 dark:hover:bg-gray-700">
                       <div>
                         <p className="font-medium">Reconciliation complete</p>
-                        <p className="text-sm text-gray-500">April reconciliation has been completed</p>
-                        <p className="text-xs text-gray-400">3 hours ago</p>
+                        <p className="text-sm text-gray-500 dark:text-gray-400">April reconciliation has been completed</p>
+                        <p className="text-xs text-gray-400 dark:text-gray-500">3 hours ago</p>
                       </div>
                     </DropdownMenuItem>
                   </div>
                   <DropdownMenuSeparator />
-                  <DropdownMenuItem className="cursor-pointer">
+                  <DropdownMenuItem className="cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-700">
                     <div className="text-center w-full">
-                      <span className="text-insura-600">View all</span>
+                      <span className="text-discrepay-600 dark:text-discrepay-400">View all</span>
                     </div>
                   </DropdownMenuItem>
                 </DropdownMenuContent>
@@ -270,28 +323,28 @@ export default function AppLayout({ children }: AppLayoutProps) {
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                   <Button variant="ghost" className="relative h-8 w-8 rounded-full">
-                    <Avatar className="h-8 w-8">
-                      <AvatarFallback className="bg-insura-100 text-insura-800">RJ</AvatarFallback>
+                    <Avatar className="h-8 w-8 border-2 border-discrepay-200 dark:border-discrepay-800">
+                      <AvatarFallback className="bg-discrepay-100 text-discrepay-800 dark:bg-discrepay-800 dark:text-discrepay-200">RJ</AvatarFallback>
                     </Avatar>
                   </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end">
                   <DropdownMenuLabel>My Account</DropdownMenuLabel>
                   <DropdownMenuSeparator />
-                  <DropdownMenuItem asChild>
+                  <DropdownMenuItem asChild className="hover:bg-gray-100 dark:hover:bg-gray-700">
                     <Link to="/profile">
                       <User className="mr-2 h-4 w-4" />
                       <span>Profile</span>
                     </Link>
                   </DropdownMenuItem>
-                  <DropdownMenuItem asChild>
+                  <DropdownMenuItem asChild className="hover:bg-gray-100 dark:hover:bg-gray-700">
                     <Link to="/settings">
                       <Settings className="mr-2 h-4 w-4" />
                       <span>Settings</span>
                     </Link>
                   </DropdownMenuItem>
                   <DropdownMenuSeparator />
-                  <DropdownMenuItem onClick={handleLogout}>
+                  <DropdownMenuItem onClick={handleLogout} className="hover:bg-gray-100 dark:hover:bg-gray-700">
                     Log out
                   </DropdownMenuItem>
                 </DropdownMenuContent>
@@ -301,6 +354,10 @@ export default function AppLayout({ children }: AppLayoutProps) {
         </div>
 
         <main className="flex-1 overflow-y-auto bg-gray-50 p-4 md:p-6 dark:bg-gray-900 dark:text-gray-200">
+          <div className="mb-6">
+            <h1 className="text-xl font-medium text-gray-700 dark:text-gray-200">{getGreeting()}, {userName}</h1>
+            <p className="text-sm text-gray-500 dark:text-gray-400">Here's what's happening with your insurance management today</p>
+          </div>
           {children}
         </main>
       </div>
