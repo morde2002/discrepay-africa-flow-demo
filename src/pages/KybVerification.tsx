@@ -13,14 +13,24 @@ import {
   CardTitle,
   CardDescription,
 } from "@/components/ui/card";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+} from "@/components/ui/dialog";
 import { toast } from "sonner";
 import { useAuth } from "@/components/auth/AuthContext";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Separator } from "@/components/ui/separator";
+import { AlertCircle, Loader } from "lucide-react";
 
 const KybVerification = () => {
   const { user, updateUserData } = useAuth();
   const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(false);
+  const [showVerificationDialog, setShowVerificationDialog] = useState(false);
 
   // KYB details
   const [registrationNumber, setRegistrationNumber] = useState("");
@@ -34,6 +44,9 @@ const KybVerification = () => {
     director: null,
     crb: null
   });
+
+  // Service agreement acceptance
+  const [agreedToTerms, setAgreedToTerms] = useState(false);
 
   const handleDocumentChange = (e: React.ChangeEvent<HTMLInputElement>, docType: string) => {
     if (e.target.files && e.target.files.length > 0) {
@@ -61,6 +74,11 @@ const KybVerification = () => {
       return;
     }
 
+    if (!agreedToTerms) {
+      toast.error("You must accept the service agreement to continue");
+      return;
+    }
+
     setIsLoading(true);
 
     // Simulate API call for KYB verification
@@ -70,191 +88,259 @@ const KybVerification = () => {
       // Update KYB status
       updateUserData({ kybStatus: "pending" });
       
-      toast.success("KYB details submitted successfully!");
-      navigate("/service-agreement");
+      // Show verification dialog
+      setShowVerificationDialog(true);
     }, 2000);
   };
 
-  return (
-    <div className="flex min-h-screen items-center justify-center bg-gradient-to-b from-gray-50 to-gray-100 p-4">
-      <div className="w-full max-w-lg space-y-4">
-        <div className="text-center">
-          <img
-            src="/lovable-uploads/c6b58a34-ac83-45c0-8be4-4c26b436414d.png"
-            alt="Discrepay Logo"
-            className="mx-auto h-12 w-auto"
-          />
-          <h1 className="text-3xl font-bold text-primary">Discrepay</h1>
-          <p className="text-gray-500">Monitor, Control and Settle Your Financial Operations in Real Time</p>
-        </div>
+  const handleContinue = () => {
+    setShowVerificationDialog(false);
+    navigate("/service-agreement");
+  };
 
-        <Card className="border-primary/20 shadow-lg">
-          <CardHeader>
-            <CardTitle>Business Verification</CardTitle>
-            <CardDescription>
-              Step 3: Provide your business details and documentation for KYB verification
-            </CardDescription>
-          </CardHeader>
-          <form onSubmit={handleSubmit}>
-            <CardContent className="space-y-4">
-              <div className="space-y-2">
-                <Label htmlFor="registration-number">Company Registration Number</Label>
-                <Input
-                  id="registration-number"
-                  placeholder="Enter registration number"
-                  value={registrationNumber}
-                  onChange={(e) => setRegistrationNumber(e.target.value)}
-                  required
-                />
-              </div>
-              
-              <div className="space-y-2">
-                <Label htmlFor="business-address">Business Address</Label>
-                <Input
-                  id="business-address"
-                  placeholder="Enter complete business address"
-                  value={businessAddress}
-                  onChange={(e) => setBusinessAddress(e.target.value)}
-                  required
-                />
-              </div>
-              
-              <div className="space-y-2">
-                <Label htmlFor="tax-id">Tax ID</Label>
-                <Input
-                  id="tax-id"
-                  placeholder="Enter tax identification number"
-                  value={taxId}
-                  onChange={(e) => setTaxId(e.target.value)}
-                  required
-                />
-              </div>
-              
-              <div className="space-y-4 pt-4">
-                <h3 className="font-medium text-base">Required Documents</h3>
-                <p className="text-sm text-gray-500">Upload at least one of the following documents:</p>
+  return (
+    <>
+      <div className="flex min-h-screen items-center justify-center bg-gradient-to-b from-gray-50 to-gray-100 p-4">
+        <div className="w-full max-w-lg space-y-4">
+          <div className="text-center">
+            <img
+              src="/lovable-uploads/c6b58a34-ac83-45c0-8be4-4c26b436414d.png"
+              alt="Discrepay Logo"
+              className="mx-auto h-12 w-auto"
+            />
+            <h1 className="text-3xl font-bold text-primary">Discrepay</h1>
+            <p className="text-gray-500">Monitor, Control and Settle Your Financial Operations in Real Time</p>
+          </div>
+
+          <Card className="border-primary/20 shadow-lg">
+            <CardHeader>
+              <CardTitle>Business Verification</CardTitle>
+              <CardDescription>
+                Step 3: Provide your business details and documentation for KYB verification
+              </CardDescription>
+            </CardHeader>
+            <form onSubmit={handleSubmit}>
+              <CardContent className="space-y-4">
+                <div className="space-y-2">
+                  <Label htmlFor="registration-number">Company Registration Number</Label>
+                  <Input
+                    id="registration-number"
+                    placeholder="Enter registration number"
+                    value={registrationNumber}
+                    onChange={(e) => setRegistrationNumber(e.target.value)}
+                    required
+                  />
+                </div>
                 
-                <div className="space-y-4">
-                  <div className="space-y-2">
-                    <div className="flex items-center justify-between">
-                      <Label htmlFor="certificate-incorporation">Certificate of Incorporation</Label>
-                      {documentFiles.incorporation && (
-                        <span className="text-xs text-green-600">
-                          File selected: {documentFiles.incorporation.name}
-                        </span>
-                      )}
+                <div className="space-y-2">
+                  <Label htmlFor="business-address">Business Address</Label>
+                  <Input
+                    id="business-address"
+                    placeholder="Enter complete business address"
+                    value={businessAddress}
+                    onChange={(e) => setBusinessAddress(e.target.value)}
+                    required
+                  />
+                </div>
+                
+                <div className="space-y-2">
+                  <Label htmlFor="tax-id">Tax ID</Label>
+                  <Input
+                    id="tax-id"
+                    placeholder="Enter tax identification number"
+                    value={taxId}
+                    onChange={(e) => setTaxId(e.target.value)}
+                    required
+                  />
+                </div>
+                
+                <div className="space-y-4 pt-4">
+                  <h3 className="font-medium text-base">Required Documents</h3>
+                  <p className="text-sm text-gray-500">Upload at least one of the following documents:</p>
+                  
+                  <div className="space-y-4">
+                    <div className="space-y-2">
+                      <div className="flex items-center justify-between">
+                        <Label htmlFor="certificate-incorporation">Certificate of Incorporation</Label>
+                        {documentFiles.incorporation && (
+                          <span className="text-xs text-green-600">
+                            File selected: {documentFiles.incorporation.name}
+                          </span>
+                        )}
+                      </div>
+                      <div className="flex items-center justify-center w-full">
+                        <label
+                          htmlFor="certificate-incorporation"
+                          className="flex flex-col items-center justify-center w-full h-24 border-2 border-dashed border-primary/20 rounded-lg cursor-pointer bg-gray-50 hover:bg-gray-100"
+                        >
+                          <div className="flex flex-col items-center justify-center pt-5 pb-6">
+                            <p className="mb-2 text-sm text-gray-500">
+                              <span className="font-semibold">Click to upload</span> or drag and drop
+                            </p>
+                            <p className="text-xs text-gray-500">PDF, JPG, PNG (MAX. 10MB)</p>
+                          </div>
+                          <input
+                            id="certificate-incorporation"
+                            type="file"
+                            className="hidden"
+                            accept=".pdf,.jpg,.jpeg,.png"
+                            onChange={(e) => handleDocumentChange(e, 'incorporation')}
+                          />
+                        </label>
+                      </div>
                     </div>
-                    <div className="flex items-center justify-center w-full">
-                      <label
-                        htmlFor="certificate-incorporation"
-                        className="flex flex-col items-center justify-center w-full h-24 border-2 border-dashed border-primary/20 rounded-lg cursor-pointer bg-gray-50 hover:bg-gray-100"
-                      >
-                        <div className="flex flex-col items-center justify-center pt-5 pb-6">
-                          <p className="mb-2 text-sm text-gray-500">
-                            <span className="font-semibold">Click to upload</span> or drag and drop
-                          </p>
-                          <p className="text-xs text-gray-500">PDF, JPG, PNG (MAX. 10MB)</p>
-                        </div>
-                        <input
-                          id="certificate-incorporation"
-                          type="file"
-                          className="hidden"
-                          accept=".pdf,.jpg,.jpeg,.png"
-                          onChange={(e) => handleDocumentChange(e, 'incorporation')}
-                        />
-                      </label>
+                    
+                    <div className="space-y-2">
+                      <div className="flex items-center justify-between">
+                        <Label htmlFor="director-id">Director ID/Passport</Label>
+                        {documentFiles.director && (
+                          <span className="text-xs text-green-600">
+                            File selected: {documentFiles.director.name}
+                          </span>
+                        )}
+                      </div>
+                      <div className="flex items-center justify-center w-full">
+                        <label
+                          htmlFor="director-id"
+                          className="flex flex-col items-center justify-center w-full h-24 border-2 border-dashed border-primary/20 rounded-lg cursor-pointer bg-gray-50 hover:bg-gray-100"
+                        >
+                          <div className="flex flex-col items-center justify-center pt-5 pb-6">
+                            <p className="mb-2 text-sm text-gray-500">
+                              <span className="font-semibold">Click to upload</span> or drag and drop
+                            </p>
+                            <p className="text-xs text-gray-500">PDF, JPG, PNG (MAX. 10MB)</p>
+                          </div>
+                          <input
+                            id="director-id"
+                            type="file"
+                            className="hidden"
+                            accept=".pdf,.jpg,.jpeg,.png"
+                            onChange={(e) => handleDocumentChange(e, 'director')}
+                          />
+                        </label>
+                      </div>
+                    </div>
+                    
+                    <div className="space-y-2">
+                      <div className="flex items-center justify-between">
+                        <Label htmlFor="crb-certificate">CRB Certificate</Label>
+                        {documentFiles.crb && (
+                          <span className="text-xs text-green-600">
+                            File selected: {documentFiles.crb.name}
+                          </span>
+                        )}
+                      </div>
+                      <div className="flex items-center justify-center w-full">
+                        <label
+                          htmlFor="crb-certificate"
+                          className="flex flex-col items-center justify-center w-full h-24 border-2 border-dashed border-primary/20 rounded-lg cursor-pointer bg-gray-50 hover:bg-gray-100"
+                        >
+                          <div className="flex flex-col items-center justify-center pt-5 pb-6">
+                            <p className="mb-2 text-sm text-gray-500">
+                              <span className="font-semibold">Click to upload</span> or drag and drop
+                            </p>
+                            <p className="text-xs text-gray-500">PDF, JPG, PNG (MAX. 10MB)</p>
+                          </div>
+                          <input
+                            id="crb-certificate"
+                            type="file"
+                            className="hidden"
+                            accept=".pdf,.jpg,.jpeg,.png"
+                            onChange={(e) => handleDocumentChange(e, 'crb')}
+                          />
+                        </label>
+                      </div>
                     </div>
                   </div>
                   
-                  <div className="space-y-2">
-                    <div className="flex items-center justify-between">
-                      <Label htmlFor="director-id">Director ID/Passport</Label>
-                      {documentFiles.director && (
-                        <span className="text-xs text-green-600">
-                          File selected: {documentFiles.director.name}
-                        </span>
-                      )}
-                    </div>
-                    <div className="flex items-center justify-center w-full">
+                  <div className="mt-6 pt-4 border-t">
+                    <div className="flex items-center space-x-2">
+                      <Checkbox
+                        id="service-agreement"
+                        checked={agreedToTerms}
+                        onCheckedChange={(checked) => setAgreedToTerms(!!checked)}
+                      />
                       <label
-                        htmlFor="director-id"
-                        className="flex flex-col items-center justify-center w-full h-24 border-2 border-dashed border-primary/20 rounded-lg cursor-pointer bg-gray-50 hover:bg-gray-100"
+                        htmlFor="service-agreement"
+                        className="text-sm font-medium leading-none cursor-pointer"
                       >
-                        <div className="flex flex-col items-center justify-center pt-5 pb-6">
-                          <p className="mb-2 text-sm text-gray-500">
-                            <span className="font-semibold">Click to upload</span> or drag and drop
-                          </p>
-                          <p className="text-xs text-gray-500">PDF, JPG, PNG (MAX. 10MB)</p>
-                        </div>
-                        <input
-                          id="director-id"
-                          type="file"
-                          className="hidden"
-                          accept=".pdf,.jpg,.jpeg,.png"
-                          onChange={(e) => handleDocumentChange(e, 'director')}
-                        />
+                        I have read and agree to the service agreement
                       </label>
                     </div>
-                  </div>
-                  
-                  <div className="space-y-2">
-                    <div className="flex items-center justify-between">
-                      <Label htmlFor="crb-certificate">CRB Certificate</Label>
-                      {documentFiles.crb && (
-                        <span className="text-xs text-green-600">
-                          File selected: {documentFiles.crb.name}
-                        </span>
-                      )}
-                    </div>
-                    <div className="flex items-center justify-center w-full">
-                      <label
-                        htmlFor="crb-certificate"
-                        className="flex flex-col items-center justify-center w-full h-24 border-2 border-dashed border-primary/20 rounded-lg cursor-pointer bg-gray-50 hover:bg-gray-100"
-                      >
-                        <div className="flex flex-col items-center justify-center pt-5 pb-6">
-                          <p className="mb-2 text-sm text-gray-500">
-                            <span className="font-semibold">Click to upload</span> or drag and drop
-                          </p>
-                          <p className="text-xs text-gray-500">PDF, JPG, PNG (MAX. 10MB)</p>
-                        </div>
-                        <input
-                          id="crb-certificate"
-                          type="file"
-                          className="hidden"
-                          accept=".pdf,.jpg,.jpeg,.png"
-                          onChange={(e) => handleDocumentChange(e, 'crb')}
-                        />
-                      </label>
-                    </div>
+                    <p className="text-xs text-muted-foreground mt-1 ml-6">
+                      By checking this box, you agree to our Terms of Service and Privacy Policy.
+                    </p>
                   </div>
                 </div>
-              </div>
-            </CardContent>
-            <CardFooter className="flex flex-col space-y-3">
-              <Button 
-                type="submit" 
-                className="w-full bg-gradient-to-r from-primary to-primary/80"
-                disabled={isLoading || !registrationNumber || !businessAddress || !taxId || selectedDocuments.length === 0}
-              >
-                {isLoading ? "Submitting..." : "Submit & Continue"}
-              </Button>
-              <Button 
-                type="button" 
-                variant="ghost" 
-                className="w-full"
-                onClick={() => navigate("/verify-email")}
-              >
-                Back to Email Verification
-              </Button>
-            </CardFooter>
-          </form>
-        </Card>
+              </CardContent>
+              <CardFooter className="flex flex-col space-y-3">
+                <Button 
+                  type="submit" 
+                  className="w-full bg-gradient-to-r from-primary to-primary/80"
+                  disabled={isLoading || !registrationNumber || !businessAddress || !taxId || selectedDocuments.length === 0 || !agreedToTerms}
+                >
+                  {isLoading ? (
+                    <>
+                      <Loader className="mr-2 h-4 w-4 animate-spin" /> 
+                      Submitting...
+                    </>
+                  ) : "Submit & Continue"}
+                </Button>
+                <Button 
+                  type="button" 
+                  variant="ghost" 
+                  className="w-full"
+                  onClick={() => navigate("/verify-email")}
+                >
+                  Back to Email Verification
+                </Button>
+              </CardFooter>
+            </form>
+          </Card>
 
-        <div className="text-center text-xs text-gray-500">
-          <p>Your information is securely encrypted and will be used for verification purposes only.</p>
+          <div className="text-center text-xs text-gray-500">
+            <p>Your information is securely encrypted and will be used for verification purposes only.</p>
+          </div>
         </div>
       </div>
-    </div>
+      
+      {/* Verification Dialog */}
+      <Dialog open={showVerificationDialog} onOpenChange={setShowVerificationDialog}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle className="flex items-center text-center justify-center">
+              <AlertCircle className="h-6 w-6 text-amber-500 mr-2" />
+              Documents Under Review
+            </DialogTitle>
+            <DialogDescription className="text-center pt-2">
+              Your business documents have been submitted successfully and are now under review. This process typically takes 1-2 business days.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4 py-4">
+            <div className="bg-amber-50 p-4 rounded-md">
+              <h4 className="font-medium text-amber-800 mb-2">What happens next?</h4>
+              <ul className="text-sm space-y-2 text-amber-800">
+                <li className="flex items-start">
+                  <span className="mr-2">1.</span>
+                  <span>Our compliance team will review your submitted documents.</span>
+                </li>
+                <li className="flex items-start">
+                  <span className="mr-2">2.</span>
+                  <span>You'll receive an email notification once the review is complete.</span>
+                </li>
+                <li className="flex items-start">
+                  <span className="mr-2">3.</span>
+                  <span>You can continue to log in with limited access while your account is pending verification.</span>
+                </li>
+              </ul>
+            </div>
+          </div>
+          <div className="flex justify-center">
+            <Button onClick={handleContinue} className="w-full sm:w-auto">Continue to Service Agreement</Button>
+          </div>
+        </DialogContent>
+      </Dialog>
+    </>
   );
 };
 

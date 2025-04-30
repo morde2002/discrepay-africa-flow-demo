@@ -2,6 +2,7 @@
 import AppLayout from '@/components/layout/AppLayout';
 import { Button } from '@/components/ui/button';
 import DashboardCard from '@/components/ui/DashboardCard';
+import VerificationStatusBanner from '@/components/dashboard/VerificationStatusBanner';
 import {
   Card,
   CardContent,
@@ -15,6 +16,7 @@ import {
   TabsTrigger,
 } from '@/components/ui/tabs';
 import { Progress } from '@/components/ui/progress';
+import { useAuth } from '@/components/auth/AuthContext';
 import { FileText, TrendingUp, AlertTriangle, CheckCircle, User, DollarSign, Download } from 'lucide-react';
 import { 
   BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip as RechartsTooltip, 
@@ -63,12 +65,18 @@ const STATUS_COLORS = {
 };
 
 const Index = () => {
+  const { user } = useAuth();
+  const isTestMode = user?.isTestMode || false;
+  
   const handleExportData = () => {
     toast.success("Exporting data...");
   };
 
   return (
     <AppLayout>
+      {/* Verification Status Banner */}
+      <VerificationStatusBanner isTestMode={isTestMode} />
+      
       {/* Key Metrics */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
         <Card className="hover:shadow-md transition-shadow">

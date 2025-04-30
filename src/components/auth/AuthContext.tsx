@@ -1,4 +1,3 @@
-
 import React, { createContext, useContext, useState, useEffect, ReactNode } from "react";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
@@ -14,6 +13,7 @@ interface UserData {
   email?: string;
   verificationStatus?: VerificationStatus;
   kybStatus?: VerificationStatus;
+  isTestMode?: boolean;
 }
 
 interface AuthContextType {
@@ -23,6 +23,7 @@ interface AuthContextType {
   logout: () => void;
   isAuthenticated: () => boolean;
   getUserRole: () => string | null;
+  isAccountActive: () => boolean;
   verificationStep: number;
   setVerificationStep: (step: number) => void;
   updateUserData: (data: Partial<UserData>) => void;
@@ -49,6 +50,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       const kybStatus = localStorage.getItem("kybStatus") as VerificationStatus || "unverified";
       const businessName = localStorage.getItem("businessName") || undefined;
       const email = localStorage.getItem("businessEmail") || undefined;
+      const isTestMode = localStorage.getItem("isTestMode") === "true";
       
       setUser({
         username,
@@ -56,7 +58,8 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         businessName,
         email,
         verificationStatus,
-        kybStatus
+        kybStatus,
+        isTestMode
       });
       setStatus("authenticated");
     } else {
@@ -68,14 +71,25 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     if (username === VALID_CREDENTIALS.username && password === VALID_CREDENTIALS.password) {
       localStorage.setItem("isAuthenticated", "true");
       localStorage.setItem("userRole", "admin");
+      localStorage.setItem("isTestMode", "true"); // For demo purposes
       
       if (remember) {
         localStorage.setItem("rememberedUser", username);
       }
       
+      const kybStatus = localStorage.getItem("kybStatus") as VerificationStatus || "pending";
+      const verificationStatus = localStorage.getItem("verificationStatus") as VerificationStatus || "approved";
+      const businessName = localStorage.getItem("businessName") || "RJ Logistics";
+      const email = localStorage.getItem("businessEmail") || "info@rjlogistics.com";
+      
       setUser({
         username,
-        role: "admin"
+        role: "admin",
+        kybStatus,
+        verificationStatus,
+        businessName,
+        email,
+        isTestMode: true // For demo purposes
       });
       
       setStatus("authenticated");
@@ -89,10 +103,8 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     localStorage.removeItem("isAuthenticated");
     localStorage.removeItem("userRole");
     localStorage.removeItem("rememberedUser");
-    localStorage.removeItem("verificationStatus");
-    localStorage.removeItem("kybStatus");
-    localStorage.removeItem("businessName");
-    localStorage.removeItem("businessEmail");
+    localStorage.removeItem("isTestMode");
+    // We don't remove verification status on logout to keep the user's progress
     setUser(null);
     setStatus("unauthenticated");
     navigate("/auth");
@@ -106,6 +118,12 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     return localStorage.getItem("userRole");
   };
 
+  const isAccountActive = (): boolean => {
+    // Account is active if KYB status is approved
+    const kybStatus = user?.kybStatus || localStorage.getItem("kybStatus") as VerificationStatus;
+    return kybStatus === "approved";
+  };
+
   const updateUserData = (data: Partial<UserData>) => {
     setUser(prev => {
       const updatedUser = { ...prev, ...data } as UserData;
@@ -115,6 +133,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       if (data.email) localStorage.setItem("businessEmail", data.email);
       if (data.verificationStatus) localStorage.setItem("verificationStatus", data.verificationStatus);
       if (data.kybStatus) localStorage.setItem("kybStatus", data.kybStatus);
+      if (data.isTestMode !== undefined) localStorage.setItem("isTestMode", data.isTestMode ? "true" : "false");
       
       return updatedUser;
     });
@@ -128,7 +147,8 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         login, 
         logout, 
         isAuthenticated, 
-        getUserRole, 
+        getUserRole,
+        isAccountActive,
         verificationStep, 
         setVerificationStep,
         updateUserData
