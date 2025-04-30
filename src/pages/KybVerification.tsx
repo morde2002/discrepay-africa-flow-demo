@@ -256,21 +256,23 @@ const KybVerification = () => {
                   <div className="mt-6 pt-4 border-t">
                     <div className="flex items-center space-x-2">
                       <Checkbox
-                        id="service-agreement"
+                        id="business-certification"
                         checked={agreedToTerms}
                         onCheckedChange={(checked) => setAgreedToTerms(!!checked)}
                       />
                       <label
-                        htmlFor="service-agreement"
+                        htmlFor="business-certification"
                         className="text-sm font-medium leading-none cursor-pointer"
                       >
-                        I have read and agree to the service agreement
+                        I confirm the accuracy of my business details and uploaded documents
                       </label>
                     </div>
                     <p className="text-xs text-muted-foreground mt-1 ml-6">
-                      By checking this box, you agree to our Terms of Service and Privacy Policy.
+                      By checking this box, you certify that all submitted business information and documents are accurate, valid, 
+                      and legally recognized.
                     </p>
                   </div>
+
                 </div>
               </CardContent>
               <CardFooter className="flex flex-col space-y-3">
@@ -310,36 +312,39 @@ const KybVerification = () => {
           <DialogHeader>
             <DialogTitle className="flex items-center text-center justify-center">
               <AlertCircle className="h-6 w-6 text-amber-500 mr-2" />
-              Documents Under Review
+              Ready to Submit Your Documents?
             </DialogTitle>
             <DialogDescription className="text-center pt-2">
-              Your business documents have been submitted successfully and are now under review. This process typically takes 1-2 business days.
+              To submit your business documents for review by our compliance team, you must first review and accept the Service Agreement on the next page.
             </DialogDescription>
           </DialogHeader>
           <div className="space-y-4 py-4">
             <div className="bg-amber-50 p-4 rounded-md">
-              <h4 className="font-medium text-amber-800 mb-2">What happens next?</h4>
+              <h4 className="font-medium text-amber-800 mb-2">What you’ll do next</h4>
               <ul className="text-sm space-y-2 text-amber-800">
                 <li className="flex items-start">
                   <span className="mr-2">1.</span>
-                  <span>Our compliance team will review your submitted documents.</span>
+                  <span>Click “Review Service Agreement” below.</span>
                 </li>
                 <li className="flex items-start">
                   <span className="mr-2">2.</span>
-                  <span>You'll receive an email notification once the review is complete.</span>
+                  <span>Read through and accept all terms in the agreement.</span>
                 </li>
                 <li className="flex items-start">
                   <span className="mr-2">3.</span>
-                  <span>You can continue to log in with limited access while your account is pending verification.</span>
+                  <span>After acceptance, your business documents will be submitted automatically for compliance review.</span>
                 </li>
               </ul>
             </div>
           </div>
           <div className="flex justify-center">
-            <Button onClick={handleContinue} className="w-full sm:w-auto">Continue to Service Agreement</Button>
+            <Button onClick={handleContinue} className="w-full sm:w-auto">
+              Review Service Agreement
+            </Button>
           </div>
         </DialogContent>
       </Dialog>
+
     </>
   );
 };

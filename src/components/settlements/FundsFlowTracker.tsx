@@ -1,14 +1,23 @@
-
-import React, { useState } from "react";
+import React, { useMemo, useState } from "react";
 import DashboardCard from "@/components/ui/DashboardCard";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
-import { TransactionInvestigation } from "./TransactionInvestigation";
 import { Button } from "@/components/ui/button";
-import { Search, Download, Calendar } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Download, Calendar } from "lucide-react";
+import { useReactTable, getCoreRowModel, getSortedRowModel, getPaginationRowModel, flexRender } from '@tanstack/react-table';
+import { motion, AnimatePresence } from 'framer-motion';
+import { TransactionInvestigation } from "./TransactionInvestigation";
 
+// Sample data
 const transactions = [
   {
     id: "TX938485",
@@ -72,123 +81,174 @@ const transactions = [
   }
 ];
 
-const FundsFlowTracker = () => {
-  const [searchTerm, setSearchTerm] = useState("");
-  const [dateFilter, setDateFilter] = useState("all");
-  const [processorFilter, setProcessorFilter] = useState("all");
+const statusStyles = {
+  matched: "bg-green-100 text-green-800",
+  delayed: "bg-amber-100 text-amber-800",
+  partial: "bg-orange-100 text-orange-800",
+  missing: "bg-red-100 text-red-800",
+};
 
-  const filteredTransactions = transactions.filter((tx) => {
-    // Search filter
-    const matchesSearch = tx.id.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         tx.processor.toLowerCase().includes(searchTerm.toLowerCase());
-    
-    // Date filter
-    const matchesDate = dateFilter === "all" || tx.date === dateFilter;
-    
-    // Processor filter
-    const matchesProcessor = processorFilter === "all" || tx.processor === processorFilter;
-    
-    return matchesSearch && matchesDate && matchesProcessor;
+const FundsFlowTracker = () => {
+  // State
+  const [globalFilter, setGlobalFilter] = useState('');
+  const [dateFilter, setDateFilter] = useState({ from: '', to: '' });
+  const [processorFilter, setProcessorFilter] = useState('all');
+
+  // Columns definition
+  const columns = useMemo(() => [
+    { accessorKey: 'id', header: 'Transaction ID', enableSorting: true },
+    { accessorKey: 'initiatedAmount', header: 'Initiated', enableSorting: true },
+    { accessorKey: 'settledAmount', header: 'Settled', enableSorting: true },
+    {
+      accessorKey: 'status', header: 'Status', cell: info => (
+        <Badge className={statusStyles[info.getValue()]}>
+          {info.getValue().charAt(0).toUpperCase() + info.getValue().slice(1)}
+        </Badge>
+      )
+    },
+    { accessorKey: 'processor', header: 'Processor', enableSorting: true },
+    { accessorKey: 'processorFee', header: 'Fee %' },
+    { accessorKey: 'processorFeeAmount', header: 'Fee Amount' },
+    { accessorKey: 'netAmount', header: 'Net', enableSorting: true },
+    { accessorKey: 'time', header: 'Time' },
+    {
+      id: 'actions', header: 'Action', cell: info => (
+        <TransactionInvestigation transactionId={info.row.original.id} />
+      )
+    }
+  ], []);
+
+  // Table instance
+  const table = useReactTable({
+    data: transactions,
+    columns,
+    state: { globalFilter },
+    onGlobalFilterChange: setGlobalFilter,
+    getCoreRowModel: getCoreRowModel(),
+    getSortedRowModel: getSortedRowModel(),
+    getPaginationRowModel: getPaginationRowModel(),
+    globalFilterFn: 'includesString',
   });
 
-  const statusBadgeColor = (status: string) => {
-    switch(status) {
-      case "matched": return "bg-green-100 text-green-800";
-      case "delayed": return "bg-amber-100 text-amber-800";
-      case "partial": return "bg-orange-100 text-orange-800";
-      case "missing": return "bg-red-100 text-red-800";
-      default: return "bg-gray-100 text-gray-800";
-    }
+  // Export CSV
+  const exportCSV = () => {
+    const headers = columns.map(col => col.header).join(',');
+    const rows = table.getRowModel().rows.map(row =>
+      row.getVisibleCells().map(cell => cell.getValue()).join(',')
+    );
+    const csv = [headers, ...rows].join("\n");
+    const blob = new Blob([csv], { type: 'text/csv' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'transactions_export.csv';
+    a.click();
+    URL.revokeObjectURL(url);
   };
 
   return (
-    <DashboardCard 
-      title="Funds Flow Tracker" 
+    <DashboardCard
+      title="Funds Flow Tracker"
       className="mb-6"
       action={
-        <Button variant="outline" size="sm">
-          <Download className="h-4 w-4 mr-1" />
-          Export
+        <Button onClick={exportCSV} size="sm" variant="outline">
+          <Download className="mr-1 h-4 w-4" />Export CSV
         </Button>
       }
     >
-      <div className="flex flex-col md:flex-row gap-4 mb-4">
+      <div className="flex flex-col lg:flex-row lg:items-center gap-4 mb-4">
+        {/* Global Search */}
         <div className="relative flex-1">
-          <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
+          <Calendar className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
           <Input
+            placeholder="Search all fields..."
+            value={globalFilter}
+            onChange={e => setGlobalFilter(e.target.value)}
             className="pl-8"
-            placeholder="Search transactions..."
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
           />
         </div>
-        <div className="flex gap-2">
-          <Select value={dateFilter} onValueChange={setDateFilter}>
-            <SelectTrigger className="w-[140px]">
-              <Calendar className="mr-2 h-4 w-4" />
-              <SelectValue placeholder="Date Filter" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">All Dates</SelectItem>
-              <SelectItem value="2024-04-27">Today</SelectItem>
-              <SelectItem value="2024-04-26">Yesterday</SelectItem>
-              <SelectItem value="2024-04-25">2 Days Ago</SelectItem>
-            </SelectContent>
-          </Select>
-          <Select value={processorFilter} onValueChange={setProcessorFilter}>
-            <SelectTrigger className="w-[160px]">
-              <SelectValue placeholder="Filter by Processor" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">All Processors</SelectItem>
-              <SelectItem value="Paystack">Paystack</SelectItem>
-              <SelectItem value="Flutterwave">Flutterwave</SelectItem>
-              <SelectItem value="Interswitch">Interswitch</SelectItem>
-              <SelectItem value="Direct Bank">Direct Bank</SelectItem>
-            </SelectContent>
-          </Select>
+        {/* Date Range */}
+        <div className="flex items-center gap-2">
+          <Input
+            type="date"
+            value={dateFilter.from}
+            onChange={e => setDateFilter(prev => ({ ...prev, from: e.target.value }))}
+            className="w-36"
+          />
+          to
+          <Input
+            type="date"
+            value={dateFilter.to}
+            onChange={e => setDateFilter(prev => ({ ...prev, to: e.target.value }))}
+            className="w-36"
+          />
         </div>
+        {/* Processor Filter */}
+        <Select value={processorFilter} onValueChange={setProcessorFilter}>
+          <SelectTrigger className="w-40">
+            <SelectValue placeholder="All Processors" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="all">All Processors</SelectItem>
+            <SelectItem value="Paystack">Paystack</SelectItem>
+            <SelectItem value="Flutterwave">Flutterwave</SelectItem>
+            <SelectItem value="Interswitch">Interswitch</SelectItem>
+            <SelectItem value="Direct Bank">Direct Bank</SelectItem>
+          </SelectContent>
+        </Select>
       </div>
-      
-      <div className="overflow-x-auto">
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead>Transaction ID</TableHead>
-              <TableHead>Initiated Amount</TableHead>
-              <TableHead>Settled Amount</TableHead>
-              <TableHead>Status</TableHead>
-              <TableHead>Payment Processor</TableHead>
-              <TableHead>Processor Fee %</TableHead>
-              <TableHead>Processor Fee</TableHead>
-              <TableHead>Net Amount</TableHead>
-              <TableHead>Time</TableHead>
-              <TableHead>Action</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {filteredTransactions.map((tx) => (
-              <TableRow key={tx.id} className="hover:bg-muted/50">
-                <TableCell className="font-medium">{tx.id}</TableCell>
-                <TableCell>{tx.initiatedAmount}</TableCell>
-                <TableCell>{tx.settledAmount}</TableCell>
-                <TableCell>
-                  <Badge variant="outline" className={statusBadgeColor(tx.status)}>
-                    {tx.status.charAt(0).toUpperCase() + tx.status.slice(1)}
-                  </Badge>
-                </TableCell>
-                <TableCell>{tx.processor}</TableCell>
-                <TableCell>{tx.processorFee}</TableCell>
-                <TableCell>{tx.processorFeeAmount}</TableCell>
-                <TableCell>{tx.netAmount}</TableCell>
-                <TableCell>{tx.time}</TableCell>
-                <TableCell>
-                  <TransactionInvestigation transactionId={tx.id} />
-                </TableCell>
+
+      <div className="overflow-x-auto relative">
+        {/* Sticky Header */}
+        <Table className="table-auto">
+          <TableHeader className="bg-gray-50 sticky top-0 z-10">
+            {table.getHeaderGroups().map(headerGroup => (
+              <TableRow key={headerGroup.id}>
+                {headerGroup.headers.map(header => (
+                  <TableHead
+                    key={header.id}
+                    onClick={header.column.getToggleSortingHandler()}
+                    className="cursor-pointer select-none"
+                  >
+                    {flexRender(header.column.columnDef.header, header.getContext())}
+                    {{ asc: ' 🔼', desc: ' 🔽' }[header.column.getIsSorted()] ?? null}
+                  </TableHead>
+                ))}
               </TableRow>
             ))}
+          </TableHeader>
+          <TableBody>
+            <AnimatePresence>
+              {table.getRowModel().rows.map(row => (
+                <motion.tr
+                  key={row.id}
+                  layout
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                  className="hover:bg-muted/50"
+                >
+                  {row.getVisibleCells().map(cell => (
+                    <TableCell key={cell.id}>
+                      {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                    </TableCell>
+                  ))}
+                </motion.tr>
+              ))}
+            </AnimatePresence>
           </TableBody>
         </Table>
+      </div>
+
+      {/* Pagination Controls */}
+      <div className="flex items-center justify-between mt-4">
+        <div>
+          <Button onClick={() => table.previousPage()} disabled={!table.getCanPreviousPage()} size="sm">Prev</Button>
+          <Button onClick={() => table.nextPage()} disabled={!table.getCanNextPage()} size="sm" className="ml-2">Next</Button>
+        </div>
+        <span className="text-sm">
+          Page {table.getState().pagination.pageIndex + 1} of {table.getPageCount()}
+        </span>
       </div>
     </DashboardCard>
   );

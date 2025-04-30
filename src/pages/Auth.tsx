@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -41,6 +40,8 @@ const Auth = () => {
   const [termsAccepted, setTermsAccepted] = useState(false);
   const [selectedRole, setSelectedRole] = useState("admin");
 
+  const VALID_CREDENTIALS = { username: "rjlogistics", password: "Abc123**!!" };
+
   useEffect(() => {
     // If already authenticated, redirect to dashboard
     if (isAuthenticated()) {
@@ -48,25 +49,25 @@ const Auth = () => {
     }
   }, [isAuthenticated, navigate]);
 
-  const handleLogin = async (e: React.FormEvent) => {
+  const handleLogin = (e: React.FormEvent) => {
     e.preventDefault();
-    
-    setIsLoading(true);
-    
-    try {
-      const success = await login(loginUsername, loginPassword, rememberMe);
-      
-      if (success) {
-        toast.success("Login successful");
-        navigate("/");
-      } else {
-        toast.error("Invalid username or password");
-      }
-    } catch (error) {
-      toast.error("An error occurred during login");
-    } finally {
-      setIsLoading(false);
+
+    if (loginUsername !== VALID_CREDENTIALS.username || loginPassword !== VALID_CREDENTIALS.password) {
+      toast.error("Invalid username or password");
+      return;
     }
+
+    setIsLoading(true);
+    // Mock login - replace with actual authentication
+    setTimeout(() => {
+      setIsLoading(false);
+      localStorage.setItem('isAuthenticated', 'true');
+      if (rememberMe) {
+        localStorage.setItem('rememberedUser', loginUsername);
+      }
+      toast.success("Login successful");
+      navigate("/");
+    }, 1000);
   };
 
   const handleSignupSubmit = (e: React.FormEvent) => {
@@ -90,6 +91,7 @@ const Auth = () => {
 
     setIsLoading(true);
     
+    // Mock signup - replace with actual API call
     // Store business info for later verification steps
     updateUserData({
       businessName,
@@ -116,7 +118,7 @@ const Auth = () => {
   };
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-gradient-to-b from-gray-50 to-gray-100 p-4">
+    <div className="flex min-h-screen items-center justify-center bg-gray-50 p-4">
       <div className="w-full max-w-md space-y-4">
         <div className="text-center">
           <img
@@ -124,11 +126,11 @@ const Auth = () => {
             alt="Discrepay Logo"
             className="mx-auto h-12 w-auto"
           />
-          <h1 className="text-3xl font-bold text-primary">Discrepay</h1>
+          <h1 className="text-3xl font-bold">Discrepay</h1>
           <p className="text-gray-500">Monitor, Control and Settle Your Financial Operations in Real Time</p>
         </div>
 
-        <Card className="border-primary/20 shadow-lg">
+        <Card>
           <CardHeader>
             <Tabs defaultValue="login" value={activeTab} onValueChange={(value) => setActiveTab(value as "login" | "signup")}>
               <TabsList className="grid w-full grid-cols-2">
@@ -145,7 +147,6 @@ const Auth = () => {
               </TabsContent>
             </Tabs>
           </CardHeader>
-          
           {activeTab === "login" ? (
             <form onSubmit={handleLogin}>
               <CardContent className="space-y-4">

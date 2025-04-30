@@ -1,48 +1,38 @@
 
-import React from 'react';
+import { ReactNode } from "react";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { cn } from "@/lib/utils";
 
 interface DashboardCardProps {
   title: string;
-  children: React.ReactNode;
-  action?: React.ReactNode;
+  children: ReactNode;
   className?: string;
-  variant?: 'default' | 'purple' | 'blue' | 'pink' | 'orange' | 'gradient';
+  action?: ReactNode;
+  footer?: ReactNode;
+  isLoading?: boolean;
 }
 
 const DashboardCard = ({ 
   title, 
   children, 
+  className, 
   action, 
-  className = "", 
-  variant = "default" 
+  footer,
+  isLoading = false 
 }: DashboardCardProps) => {
-  const getVariantClasses = () => {
-    switch (variant) {
-      case 'purple':
-        return 'bg-gradient-to-br from-purple-500 to-indigo-600 text-white';
-      case 'blue':
-        return 'bg-gradient-to-br from-blue-500 to-cyan-600 text-white';
-      case 'pink':
-        return 'bg-gradient-to-br from-pink-500 to-rose-600 text-white';
-      case 'orange':
-        return 'bg-gradient-to-br from-orange-500 to-red-600 text-white';
-      case 'gradient':
-        return 'bg-gradient-to-br from-discrepay-500 to-secondary-400 text-white';
-      default:
-        return 'bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-200';
-    }
-  };
-
   return (
-    <div className={`rounded-xl shadow-sm border dark:border-gray-700 transition-all hover:shadow-md ${getVariantClasses()} ${className}`}>
-      <div className={`flex justify-between items-center border-b ${variant === 'default' ? 'dark:border-gray-700 border-gray-200' : 'border-white/10'} px-6 py-4`}>
-        <h3 className="font-medium">{title}</h3>
-        {action && <div>{action}</div>}
-      </div>
-      <div className="p-6">
+    <Card className={cn("shadow-sm", className)}>
+      <CardHeader className="flex flex-row items-center justify-between pb-2">
+        <CardTitle className="text-sm font-medium">{title}</CardTitle>
+        {action && <div className="flex items-center">{action}</div>}
+      </CardHeader>
+      <CardContent className={isLoading ? "opacity-60 animate-pulse" : ""}>
         {children}
-      </div>
-    </div>
+      </CardContent>
+      {footer && (
+        <div className="px-6 py-3 border-t">{footer}</div>
+      )}
+    </Card>
   );
 };
 
